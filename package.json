@@ -1,0 +1,25 @@
+{
+  "name": "levit-kit",
+  "version": "0.1.0",
+  "bin": {
+    "levit-kit": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node bin/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.2.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.9",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
+  }
+}
