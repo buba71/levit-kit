@@ -6,44 +6,47 @@ import { ProjectConfig } from "../config/types";
 export async function generateProject(config: ProjectConfig) {
   const target = path.resolve(process.cwd(), "..", config.projectName);
 
+  // Base directories
   await fs.ensureDir(target);
   await fs.ensureDir(path.join(target, "docs"));
 
-  // 1. antigravity.yaml
+  /**
+   * antigravity.yaml
+   */
   const antigravityConfig = {
     project: {
-      name: config.projectName,
-      initiative: "greenfield"
+      name: config.projectName
     },
     agents: config.agents,
     ux: config.ux,
-    governance: {
-      decision_logging: true
-    },
     quality: config.quality,
     devops: config.devops,
-    configuration_guardian: {
-      enabled: true
+    governance: {
+      configuration_guardian: true
     }
   };
 
   await fs.writeFile(
     path.join(target, "antigravity.yaml"),
-    yaml.dump(antigravityConfig)
+    yaml.dump(antigravityConfig, { noRefs: true })
   );
 
-  // 2. agents.custom.yaml
+  /**
+   * agents.custom.yaml (placeholder)
+   */
   await fs.writeFile(
     path.join(target, "agents.custom.yaml"),
     yaml.dump({ agents: {} })
   );
 
-  // 3. docs/README.md
+  /**
+   * docs/README.md
+   */
   const readme = `# ${config.projectName}
 
-This project was initialized using **Antigravity**.
+This project was initialized using **levit-kit**.
 
-## Enabled agents
+## Agents
 ${Object.entries(config.agents)
   .filter(([, enabled]) => enabled)
   .map(([name]) => `- ${name}`)
@@ -55,14 +58,42 @@ ${Object.entries(config.ux)
   .map(([name]) => `- ${name}`)
   .join("\n")}
 
-## Governance
-- Decision logging enabled
-- Configuration Guardian enabled
+## Quality
+${Object.entries(config.quality)
+  .filter(([, enabled]) => enabled)
+  .map(([name]) => `- ${name}`)
+  .join("\n")}
+
+## DevOps
+${config.devops.enabled ? "- CI/CD enabled" : "- Disabled"}
 `;
 
   await fs.writeFile(
     path.join(target, "docs", "README.md"),
     readme
   );
+
+  /**
+   * CI/CD (GitHub Actions)
+   */
+  if (config.devops.enabled) {
+    const workflowDir = path.join(
+      target,
+      ".github",
+      "workflows"
+    );
+
+    await fs.ensureDir(workflowDir);
+
+    await fs.copy(
+      path.resolve(
+        __dirname,
+        "../templates/ci/github-actions.yml"
+      ),
+      path.join(workflowDir, "ci.yml")
+    );
+  }
+
+  console.log(`\n✅ Project "${config.projectName}" generated successfully.`);
 }
 
