@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import { DEFAULTS } from "../config/defaults";
 
 export interface AgentsSelection {
   product_owner: boolean;
@@ -10,6 +11,11 @@ export interface AgentsSelection {
 }
 
 export async function askAgents(): Promise<AgentsSelection> {
+  
+  const defaultAgents = Object.entries(DEFAULTS.agents)
+    .filter(([, enabled]) => enabled)
+    .map(([agent]) => agent);
+
   const { selectedAgents } = await inquirer.prompt([
     {
       type: "checkbox",
@@ -22,7 +28,7 @@ export async function askAgents(): Promise<AgentsSelection> {
         { name: "Security", value: "security" },
         { name: "DevOps (CI/CD)", value: "devops" }
       ],
-      default: ["code_reviewer"]
+      default: defaultAgents
     }
   ]);
 

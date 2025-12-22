@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import { DEFAULTS } from "../config/defaults";
 
 export interface QualitySelection {
   tests_required: boolean;
@@ -7,24 +8,25 @@ export interface QualitySelection {
 }
 
 export async function askQuality(): Promise<QualitySelection> {
+
   const answers = await inquirer.prompt([
     {
       type: "confirm",
       name: "tests_required",
       message: "Require automated tests?",
-      default: true
+      default: DEFAULTS.quality.tests_required
     },
     {
       type: "confirm",
       name: "code_review_required",
       message: "Require code review?",
-      default: true
+      default: DEFAULTS.quality.code_review_required
     },
     {
       type: "confirm",
       name: "human_validation_required",
       message: "Require human validation for critical actions?",
-      default: true
+      default: DEFAULTS.quality.human_validation_required
     }
   ]);
 

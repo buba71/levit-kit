@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import { DEFAULTS } from "../config/defaults";
 
 export interface DevOpsSelection {
   enabled: boolean;
@@ -15,17 +16,24 @@ export async function askDevOps(): Promise<DevOpsSelection> {
       type: "confirm",
       name: "enabled",
       message: "Enable CI/CD (DevOps agent)?",
-      default: true
+      default: DEFAULTS.devops.enabled
     }
   ]);
 
   if (!enabled) {
     return {
       enabled: false,
-      environments: { staging: false, production: false },
-      require_human_approval_for_prod: false
+      environments: {
+        staging: false,
+        production: false
+      },
+      require_human_approval_for_prod: DEFAULTS.devops.require_human_approval_for_prod
     };
   }
+
+  const defaultEnvs = Object.entries(DEFAULTS.devops.environments)
+    .filter(([, enabled]) => enabled)
+    .map(([env]) => env);
 
   const { environments } = await inquirer.prompt([
     {
@@ -36,7 +44,7 @@ export async function askDevOps(): Promise<DevOpsSelection> {
         { name: "Staging", value: "staging" },
         { name: "Production", value: "production" }
       ],
-      default: ["staging"] // évite l’état vide
+      default: defaultEnvs // évite l’état vide
     }
   ]);
 
@@ -45,7 +53,7 @@ export async function askDevOps(): Promise<DevOpsSelection> {
       type: "confirm",
       name: "require_human_approval_for_prod",
       message: "Require human approval before production deploy?",
-      default: true
+      default: DEFAULTS.devops.require_human_approval_for_prod
     }
   ]);
 
