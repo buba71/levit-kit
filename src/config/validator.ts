@@ -2,8 +2,8 @@ import { ProjectConfig } from "./types";
 
 export function validateConfig(config: ProjectConfig) {
   if (config.agents.devops && !config.agents.security) {
-    throw new Error(
-      "DevOps agent requires Security agent to be enabled"
+    console.warn(
+      "⚠️ DevOps enabled without Security agent. Consider enabling Security."
     );
   }
 
