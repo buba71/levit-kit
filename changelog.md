@@ -7,6 +7,20 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
+## [0.2.2] – 2025-xx-xx
+
+### Added
+- Modular CI generation
+- Role-based documentation templates
+- Roles index with dynamic links
+- Architecture positioning (3-layer model)
+
+### Changed
+- Validator now emits warnings instead of blocking errors
+
+
+---
+
 ## [0.2.1] – 2025-12-22
 
 ### Added
