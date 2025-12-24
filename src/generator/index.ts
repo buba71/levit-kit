@@ -93,23 +93,32 @@ export async function generateProject(config: ProjectConfig) {
   /**
    * antigravity.yaml
    */
-  const antigravityConfig = {
+ const sections = [
+  {
     project: {
       name: config.projectName
-    },
-    agents: config.agents,
-    ux: config.ux,
-    quality: config.quality,
-    devops: config.devops,
+    }
+  },
+  { agents: config.agents },
+  { ux: config.ux },
+  { quality: config.quality },
+  { devops: config.devops },
+  {
     governance: {
       configuration_guardian: true
     }
-  };
+  }
+];
 
-  await fs.writeFile(
-    path.join(target, "antigravity.yaml"),
-    yaml.dump(antigravityConfig, { noRefs: true })
-  );
+const yamlContent = sections
+  .map((section) => yaml.dump(section, { noRefs: true }).trim())
+  .join("\n\n");
+
+await fs.writeFile(
+  path.join(target, "antigravity.yaml"),
+  yamlContent + "\n"
+);
+
 
   /**
    * agents.custom.yaml (placeholder)
