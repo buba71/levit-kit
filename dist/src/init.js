@@ -7,9 +7,9 @@ exports.initProject = initProject;
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 function getPackageRoot() {
-    // process.argv[1] points to the executed CLI file
-    // e.g. /path/to/levit-kit/dist/bin/cli.js
-    return node_path_1.default.resolve(node_path_1.default.dirname(process.argv[1]), "..", "..");
+    // Use __dirname to reliably locate the package root relative to this file
+    // compiled file is in dist/src/init.js, so we go up two levels to reach package root
+    return node_path_1.default.resolve(__dirname, "..", "..");
 }
 function initProject(projectName, targetPath) {
     const packageRoot = getPackageRoot();

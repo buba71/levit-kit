@@ -2,9 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 function getPackageRoot(): string {
-  // process.argv[1] points to the executed CLI file
-  // e.g. /path/to/levit-kit/dist/bin/cli.js
-  return path.resolve(path.dirname(process.argv[1]), "..", "..");
+  // Use __dirname to reliably locate the package root relative to this file
+  // compiled file is in dist/src/init.js, so we go up two levels to reach package root
+  return path.resolve(__dirname, "..", "..");
 }
 
 export function initProject(projectName: string, targetPath: string) {
