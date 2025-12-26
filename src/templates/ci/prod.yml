@@ -1,7 +1,0 @@
-  deploy_production:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Production deploy
-        run: echo "Deploy to production (manual approval required)"
