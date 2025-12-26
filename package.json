@@ -1,6 +1,15 @@
 {
-  "name": "levit-kit",
-  "version": "0.2.0",
+  "name": "levit",
+  "version": "0.3.0",
+  "description": "Hybrid starter kit for Antigravity projects",
+  "author": "David BUBA",
+  "files": [
+    "dist",
+    "templates",
+    "SOCIAL_CONTRACT.md",
+    "README.md"
+  ],
+  "license": "MIT",
   "bin": {
      "levit": "dist/bin/cli.js"
   },

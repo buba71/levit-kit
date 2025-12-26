@@ -5,6 +5,21 @@ Hybrid starter kit for **Antigravity** projects
 
 ---
 
+## Table of contents
+
+- [Why levit-kit exists](#why-levit-kit-exists)
+- [What levit-kit does](#what-levit-kit-does)
+- [What levit-kit does not do](#what-levit-kit-does-not-do)
+- [How levit-kit is used](#how-levit-kit-is-used)
+- [Where does the levit command come from](#where-does-the-levit-command-come-from)
+- [Social Contract](#social-contract)
+- [Nature of the project](#nature-of-the-project)
+- [Status](#status)
+- [Contributing](#contributing)
+- [Guiding principle](#guiding-principle)
+
+---
+
 ## Why levit-kit exists
 
 Levit-kit provides a **clean, readable, and predictable starting point** for initiating projects with Google Antigravity.
@@ -34,6 +49,39 @@ Its role is simple:
 - It introduces no magic
 
 These limits are intentional.
+
+---
+
+## How levit-kit is used
+
+Levit-kit is used **once**, at the very beginning of a project.
+
+```bash
+npx levit init my-project
+```
+
+This command:
+- creates a new project directory
+- copies the default levit-kit template
+- installs no dependency
+- exits immediately
+
+Levit-kit does not remain in the project after initialization.
+
+---
+
+## Where does the levit command come from?
+
+The `levit` command is provided through the npm ecosystem.
+
+Levit-kit is published as an npm package exposing a CLI binary named `levit`.
+When running the command above, `npx`:
+
+- downloads the package temporarily
+- executes the `levit` CLI
+- removes it after execution
+
+Nothing is installed in the generated project.
 
 ---
 
