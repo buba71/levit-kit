@@ -1,36 +1,38 @@
 {
-  "name": "levit",
+  "name": "@buba_71/levit",
   "version": "0.3.0",
   "description": "Hybrid starter kit for Antigravity projects",
   "author": "David BUBA",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "levit": "dist/bin/cli.js"
+  },
+
   "files": [
     "dist",
     "templates",
     "SOCIAL_CONTRACT.md",
     "README.md"
   ],
-  "license": "MIT",
-  "bin": {
-     "levit": "dist/bin/cli.js"
-  },
+
+  "main": "dist/src/init.js",
+
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/bin/cli.js",
     "start": "node dist/bin/cli.js",
     "test": "npm run build && node --test dist/tests"
   },
+
   "dependencies": {
-    "commander": "^11.0.0",
-    "fs-extra": "^11.2.0",
-    "inquirer": "^9.2.0",
-    "js-yaml": "^4.1.0",
-    "zod": "^4.2.1"
+    "fs-extra": "^11.2.0"
   },
+
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
-    "@types/inquirer": "^9.0.9",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.0",
-    "ts-node": "^10.9.0",
     "typescript": "^5.3.0"
   }
 }
