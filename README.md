@@ -57,16 +57,24 @@ These limits are intentional.
 Levit-kit is used **once**, at the very beginning of a project.
 
 ```bash
-npx levit init my-project
+npx @buba_71/levit init my-project
 ```
 
-This command:
-- creates a new project directory
-- copies the default levit-kit template
-- installs no dependency
-- exits immediately
+### Commands & Options
 
-Levit-kit does not remain in the project after initialization.
+- `init <name>`: Initializes a new project in the specified directory.
+- `-v, --version`: Displays the current version.
+- `-h, --help`: Displays the help message.
+
+### What happens during init?
+
+The `init` command:
+1. Creates a new project directory.
+2. Copies the **default levit-kit template**.
+3. Includes a base `.gitignore` and `package.json`.
+4. Exits immediately.
+
+Levit-kit does not remain in the project after initialization and installs no dependencies.
 
 ---
 

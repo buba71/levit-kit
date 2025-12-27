@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs from "fs-extra";
 import path from "node:path";
 
 function getPackageRoot(): string {
@@ -7,9 +7,19 @@ function getPackageRoot(): string {
   return path.resolve(__dirname, "..", "..");
 }
 
+function getVersion(): string {
+  try {
+    const packageJson = fs.readJsonSync(path.join(getPackageRoot(), "package.json"));
+    return packageJson.version;
+  } catch {
+    return "0.0.0";
+  }
+}
+
 export function initProject(projectName: string, targetPath: string) {
   const packageRoot = getPackageRoot();
   const templatePath = path.join(packageRoot, "templates", "default");
+  const version = getVersion();
 
   if (!projectName) {
     throw new Error("Project name is required.");
@@ -25,35 +35,20 @@ export function initProject(projectName: string, targetPath: string) {
     );
   }
 
-  fs.mkdirSync(targetPath, { recursive: true });
-  copyDirectory(templatePath, targetPath);
+  fs.ensureDirSync(targetPath);
+  fs.copySync(templatePath, targetPath);
 
   console.log("");
-  console.log("levit-kit v1.0");
+  console.log(`🚀 levit-kit v${version}`);
   console.log("");
-  console.log("✔ Project directory created");
-  console.log("✔ Template copied");
+  console.log("  ✔ Project directory created");
+  console.log("  ✔ Template copied");
   console.log("");
-  console.log(`Project "${projectName}" initialized successfully.`);
+  console.log(`✨ Project "${projectName}" initialized successfully.`);
   console.log("");
   console.log("Next steps:");
-  console.log("  - Open the project");
+  console.log(`  - cd ${projectName}`);
   console.log("  - Read SOCIAL_CONTRACT.md");
   console.log("  - Start defining features");
-}
-
-function copyDirectory(source: string, target: string) {
-  const entries = fs.readdirSync(source, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const sourcePath = path.join(source, entry.name);
-    const targetPath = path.join(target, entry.name);
-
-    if (entry.isDirectory()) {
-      fs.mkdirSync(targetPath, { recursive: true });
-      copyDirectory(sourcePath, targetPath);
-    } else {
-      fs.copyFileSync(sourcePath, targetPath);
-    }
-  }
+  console.log("");
 }

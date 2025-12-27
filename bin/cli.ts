@@ -2,24 +2,71 @@
 
 import { initProject } from "../src/init";
 import path from "node:path";
+import fs from "fs-extra";
+
+function getVersion(): string {
+  try {
+    const packageJson = fs.readJsonSync(path.join(__dirname, "..", "..", "package.json"));
+    return packageJson.version;
+  } catch {
+    return "unknown";
+  }
+}
+
+function showHelp() {
+  console.log(`
+Usage: levit [command] [options]
+
+Commands:
+  init <project-name>    Initialize a new levit project
+
+Options:
+  -v, --version          Show version number
+  -h, --help             Show help
+`);
+}
 
 function main() {
   const args = process.argv.slice(2);
 
-  if (args.length !== 2 || args[0] !== "init") {
-    console.error("Usage: levit init <project-name>");
-    process.exit(1);
+  if (args.includes("-h") || args.includes("--help") || args.length === 0) {
+    showHelp();
+    process.exit(0);
   }
 
-  const projectName = args[1];
-  const targetPath = path.resolve(process.cwd(), projectName);
+  if (args.includes("-v") || args.includes("--version")) {
+    console.log(`levit-kit v${getVersion()}`);
+    process.exit(0);
+  }
 
-  try {
-    initProject(projectName, targetPath);
-  } catch (error) {
-    console.error(
-      error instanceof Error ? error.message : "Unexpected error"
-    );
+  if (args[0] === "init") {
+    const projectName = args[1];
+
+    if (!projectName) {
+      console.error("Error: Project name is required.");
+      console.error("Usage: levit init <project-name>");
+      process.exit(1);
+    }
+
+    // Basic validation: ensure it's a valid directory name
+    if (!/^[a-z0-9-_]+$/i.test(projectName)) {
+      console.error("Error: Invalid project name. Use only letters, numbers, dashes, and underscores.");
+      process.exit(1);
+    }
+
+    const targetPath = path.resolve(process.cwd(), projectName);
+
+    try {
+      initProject(projectName, targetPath);
+    } catch (error) {
+      console.error(
+        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
+      );
+      process.exit(1);
+    }
+  } else {
+    console.error(`Error: Unknown command "${args[0]}"`);
+    showHelp();
     process.exit(1);
   }
 }

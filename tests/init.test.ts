@@ -3,6 +3,7 @@ import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { execSync } from "node:child_process";
 
 import { initProject } from "../src/init";
 
@@ -30,6 +31,10 @@ test("levit init copies default template exactly", () => {
   assert.ok(exists(path.join(projectPath, "pipelines")));
   assert.ok(exists(path.join(projectPath, "docs")));
 
+  // New files assertions
+  assert.ok(exists(path.join(projectPath, ".gitignore")), ".gitignore should exist");
+  assert.ok(exists(path.join(projectPath, "package.json")), "package.json should exist");
+
   // Agent boundaries
   assert.ok(
     exists(path.join(projectPath, "agents", "AGENTS.md")),
@@ -41,4 +46,27 @@ test("levit init copies default template exactly", () => {
     exists(path.join(projectPath, "features", "README.md")),
     "Feature README should exist"
   );
+
+  // Clean up
+  fs.rmSync(tempDir, { recursive: true, force: true });
+});
+
+test("CLI --help works", () => {
+  const output = execSync("node dist/bin/cli.js --help").toString();
+  assert.ok(output.includes("Usage: levit [command] [options]"));
+  assert.ok(output.includes("init <project-name>"));
+});
+
+test("CLI --version works", () => {
+  const output = execSync("node dist/bin/cli.js --version").toString();
+  assert.ok(output.startsWith("levit-kit v"));
+});
+
+test("CLI name validation works", () => {
+  try {
+    execSync("node dist/bin/cli.js init invalid/name");
+    assert.fail("Should have failed with invalid name");
+  } catch (error: any) {
+    assert.ok(error.stderr.toString().includes("Error: Invalid project name"));
+  }
 });
