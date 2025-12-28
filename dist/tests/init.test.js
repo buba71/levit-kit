@@ -28,6 +28,10 @@ function exists(p) {
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "pipelines")));
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "docs")));
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "roles", "README.md")), "Roles README should exist");
+    // AIDD assertions
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit")), ".levit directory should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "AGENT_ONBOARDING.md")), "AGENT_ONBOARDING.md should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "example-task.md")), "Example workflow should exist");
     // New files assertions
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".gitignore")), ".gitignore should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "package.json")), "package.json should exist");
