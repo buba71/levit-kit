@@ -31,7 +31,9 @@ function exists(p) {
     // AIDD assertions
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit")), ".levit directory should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "AGENT_ONBOARDING.md")), "AGENT_ONBOARDING.md should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "decision-record.md")), "decision-record.md should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "example-task.md")), "Example workflow should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "submit-for-review.md")), "Submit for review workflow should exist");
     // New files assertions
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".gitignore")), ".gitignore should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "package.json")), "package.json should exist");
@@ -39,6 +41,7 @@ function exists(p) {
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "agents", "AGENTS.md")), "Agent guidelines should exist");
     // Feature contract
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "features", "README.md")), "Feature README should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "features", "INTENT.md")), "Feature INTENT template should exist");
     // Clean up
     node_fs_1.default.rmSync(tempDir, { recursive: true, force: true });
 });

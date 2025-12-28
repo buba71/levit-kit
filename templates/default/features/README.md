@@ -1,12 +1,11 @@
 # Features
 
-A feature is a **contract**, not an implementation.
+This directory contains the roadmap and the active specifications of the project.
 
-Each feature document should define:
-- intent
-- inputs
-- outputs
-- constraints
+## How to add a feature
+1. Copy [INTENT.md](./INTENT.md) to a new file (e.g., `001-my-feature.md`).
+2. Fill the "Human Intent" sections.
+3. Let the Agent implement the technical details.
 
-Features are discussed and validated here.
-Implementation happens elsewhere.
+---
+📄 Refer to [.levit/AGENT_ONBOARDING.md](../.levit/AGENT_ONBOARDING.md) for collaboration guidelines.
