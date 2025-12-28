@@ -7,16 +7,26 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
-## [0.2.2] – 2025-xx-xx
+## [0.3.3] – 2025-12-28
 
 ### Added
-- Modular CI generation
-- Role-based documentation templates
-- Roles index with dynamic links
-- Architecture positioning (3-layer model)
+- Foundation-first project structure
+- Enhanced agentic boundaries
+- Modular documentation templates
+- Explicit social contract positioning
 
 ### Changed
-- Validator now emits warnings instead of blocking errors
+- CLI refined for minimal, high-impact initialization
+- Stabilized configuration format for long-term readability
+
+---
+
+## [0.2.2] – 2025-12-25
+
+### Added
+- Role-based documentation templates
+- Architecture positioning (3-layer model)
+- Initial path handling stabilization
 
 
 ---

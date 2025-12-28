@@ -1,17 +1,8 @@
 #!/usr/bin/env node
 
-import { initProject } from "../src/init";
+import { initProject } from "../src/commands/init";
+import { getVersion } from "../src/core/version";
 import path from "node:path";
-import fs from "fs-extra";
-
-function getVersion(): string {
-  try {
-    const packageJson = fs.readJsonSync(path.join(__dirname, "..", "..", "package.json"));
-    return packageJson.version;
-  } catch {
-    return "unknown";
-  }
-}
 
 function showHelp() {
   console.log(`

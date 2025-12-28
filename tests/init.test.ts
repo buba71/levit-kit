@@ -5,7 +5,7 @@ import path from "node:path";
 import os from "node:os";
 import { execSync } from "node:child_process";
 
-import { initProject } from "../src/init";
+import { initProject } from "../src/commands/init";
 
 function exists(p: string) {
   return fs.existsSync(p);
@@ -30,6 +30,7 @@ test("levit init copies default template exactly", () => {
   assert.ok(exists(path.join(projectPath, "roles")));
   assert.ok(exists(path.join(projectPath, "pipelines")));
   assert.ok(exists(path.join(projectPath, "docs")));
+  assert.ok(exists(path.join(projectPath, "roles", "README.md")), "Roles README should exist");
 
   // New files assertions
   assert.ok(exists(path.join(projectPath, ".gitignore")), ".gitignore should exist");

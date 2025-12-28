@@ -8,7 +8,8 @@ const node_assert_1 = __importDefault(require("node:assert"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const node_os_1 = __importDefault(require("node:os"));
-const init_1 = require("../src/init");
+const node_child_process_1 = require("node:child_process");
+const init_1 = require("../src/commands/init");
 function exists(p) {
     return node_fs_1.default.existsSync(p);
 }
@@ -26,8 +27,32 @@ function exists(p) {
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "roles")));
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "pipelines")));
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "docs")));
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "roles", "README.md")), "Roles README should exist");
+    // New files assertions
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".gitignore")), ".gitignore should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "package.json")), "package.json should exist");
     // Agent boundaries
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "agents", "AGENTS.md")), "Agent guidelines should exist");
     // Feature contract
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "features", "README.md")), "Feature README should exist");
+    // Clean up
+    node_fs_1.default.rmSync(tempDir, { recursive: true, force: true });
+});
+(0, node_test_1.default)("CLI --help works", () => {
+    const output = (0, node_child_process_1.execSync)("node dist/bin/cli.js --help").toString();
+    node_assert_1.default.ok(output.includes("Usage: levit [command] [options]"));
+    node_assert_1.default.ok(output.includes("init <project-name>"));
+});
+(0, node_test_1.default)("CLI --version works", () => {
+    const output = (0, node_child_process_1.execSync)("node dist/bin/cli.js --version").toString();
+    node_assert_1.default.ok(output.startsWith("levit-kit v"));
+});
+(0, node_test_1.default)("CLI name validation works", () => {
+    try {
+        (0, node_child_process_1.execSync)("node dist/bin/cli.js init invalid/name");
+        node_assert_1.default.fail("Should have failed with invalid name");
+    }
+    catch (error) {
+        node_assert_1.default.ok(error.stderr.toString().includes("Error: Invalid project name"));
+    }
 });

@@ -4,18 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const init_1 = require("../src/init");
+const init_1 = require("../src/commands/init");
+const version_1 = require("../src/core/version");
 const node_path_1 = __importDefault(require("node:path"));
-const fs_extra_1 = __importDefault(require("fs-extra"));
-function getVersion() {
-    try {
-        const packageJson = fs_extra_1.default.readJsonSync(node_path_1.default.join(__dirname, "..", "..", "package.json"));
-        return packageJson.version;
-    }
-    catch {
-        return "unknown";
-    }
-}
 function showHelp() {
     console.log(`
 Usage: levit [command] [options]
@@ -35,7 +26,7 @@ function main() {
         process.exit(0);
     }
     if (args.includes("-v") || args.includes("--version")) {
-        console.log(`levit-kit v${getVersion()}`);
+        console.log(`levit-kit v${(0, version_1.getVersion)()}`);
         process.exit(0);
     }
     if (args[0] === "init") {
