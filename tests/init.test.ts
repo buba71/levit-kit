@@ -38,8 +38,12 @@ test("levit init copies default template exactly", () => {
   assert.ok(exists(path.join(projectPath, ".levit", "decision-record.md")), "decision-record.md should exist");
   assert.ok(exists(path.join(projectPath, ".levit", "workflows", "example-task.md")), "Example workflow should exist");
   assert.ok(exists(path.join(projectPath, ".levit", "workflows", "submit-for-review.md")), "Submit for review workflow should exist");
+  assert.ok(exists(path.join(projectPath, ".levit", "prompts")), "Prompts directory should exist");
+  assert.ok(exists(path.join(projectPath, ".levit", "prompts", "global-rules.md")), "Global rules should exist");
 
-  // New files assertions
+  // New folders assertions
+  assert.ok(exists(path.join(projectPath, "evals")), "Evals directory should exist");
+  assert.ok(exists(path.join(projectPath, "evals", "README.md")), "Evals README should exist");
   assert.ok(exists(path.join(projectPath, ".gitignore")), ".gitignore should exist");
   assert.ok(exists(path.join(projectPath, "package.json")), "package.json should exist");
 

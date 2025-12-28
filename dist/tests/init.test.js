@@ -34,7 +34,11 @@ function exists(p) {
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "decision-record.md")), "decision-record.md should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "example-task.md")), "Example workflow should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "submit-for-review.md")), "Submit for review workflow should exist");
-    // New files assertions
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "prompts")), "Prompts directory should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "prompts", "global-rules.md")), "Global rules should exist");
+    // New folders assertions
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "evals")), "Evals directory should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "evals", "README.md")), "Evals README should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".gitignore")), ".gitignore should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, "package.json")), "package.json should exist");
     // Agent boundaries
