@@ -44,8 +44,8 @@ export function initProject(projectName: string, targetPath: string) {
     console.log("");
     console.log("Next steps:");
     console.log(`  1. cd ${projectName}`);
-    console.log("  2. Review SOCIAL_CONTRACT.md to understand the foundations");
-    console.log("  3. Define your first feature in features/README.md");
+    console.log("  2. Read README.md for the Human Operator Guide");
+    console.log("  3. Onboard your AI in .levit/AGENT_ONBOARDING.md");
     console.log("");
   } catch (error) {
     // Attempt clean up if directory was created but copy failed

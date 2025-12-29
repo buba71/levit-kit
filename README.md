@@ -34,7 +34,8 @@ Its role is simple:
 ## What levit-kit does
 
 - Initializes a standardized project structure
-- Installs explicit conventions
+- Installs explicit conventions for **AI-Driven Development (AIDD)**
+- Provides a protocol for Human-AI collaboration (Intents, Decisions, Evals)
 - Facilitates human and agent onboarding
 - Reduces unnecessary variability between projects
 
@@ -75,6 +76,18 @@ The `init` command:
 4. Exits immediately.
 
 Levit-kit does not remain in the project after initialization and installs no dependencies.
+
+---
+
+## The AIDD Workflow (Human + Agent)
+
+Levit-kit installs a cognitive pipeline in your project:
+
+1.  **Human Intent**: You define *what* you want in `features/INTENT.md`.
+2.  **Agent Onboarding**: Your AI reads `.levit/AGENT_ONBOARDING.md` to learn your rules.
+3.  **Collaborative Decision**: The agent proposes technical choices in `.levit/decision-record.md`.
+4.  **Verification**: You or the agent run quality tests in `evals/`.
+5.  **Review**: The agent submits its work following a strict protocol.
 
 ---
 
