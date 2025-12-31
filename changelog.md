@@ -7,6 +7,24 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
+## [0.4.0] – 2025-12-31
+
+### Added
+- **AIDD Lifecycle CLI**: New commands `feature new`, `decision new`, and `handoff new`.
+- **Auto-ID Generation**: Sequential 3-digit IDs (001, 002...) automatically assigned to features and ADRs.
+- **Shared Core Utilities**: Centralized ID generation and file management logic.
+- **Improved Test Suite**: Comprehensive coverage for all CLI commands and project initialization.
+
+### Changed
+- **Terminology Shift**: Rebranded from "Antigravity" projects to "AI-Driven Development (AIDD)" projects.
+- **Documentation Alignment**: Refreshed all READMEs and onboarding guides to reflect v0.4.0 functionality.
+- **Enhanced Agent Onboarding**: Updated `.levit/AGENT_ONBOARDING.md` with new context directories (`decisions`, `handoff`).
+
+### Removed
+- Manual `decision-record.md` template (superseded by `levit decision new`).
+
+---
+
 ## [0.3.3] – 2025-12-28
 
 ### Added
@@ -70,8 +88,7 @@ Versions `0.x` indicate that the public API and configuration format may still e
 ---
 
 ## Planned
-- Initiative-based workflows (feature / refactor / bugfix)
-- Advanced templates
+- Advanced templates for specific tech stacks (Next.js, Python)
 - Adapter support for additional agentic IDEs
-- CLI tests
+- Self-healing project checks (`levit audit`)
 
