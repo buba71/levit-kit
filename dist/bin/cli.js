@@ -5,6 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const init_1 = require("../src/commands/init");
+const decision_1 = require("../src/commands/decision");
+const feature_1 = require("../src/commands/feature");
+const handoff_1 = require("../src/commands/handoff");
 const version_1 = require("../src/core/version");
 const node_path_1 = __importDefault(require("node:path"));
 function showHelp() {
@@ -13,13 +16,16 @@ Usage: levit [command] [options]
 
 Commands:
   init <project-name>    Initialize a new levit project
+  feature new            Create a new feature intent file (wizard)
+  decision new           Create a new decision record (wizard)
+  handoff new            Create an agent handoff brief (wizard)
 
 Options:
   -v, --version          Show version number
   -h, --help             Show help
 `);
 }
-function main() {
+async function main() {
     const args = process.argv.slice(2);
     if (args.includes("-h") || args.includes("--help") || args.length === 0) {
         showHelp();
@@ -50,10 +56,37 @@ function main() {
             process.exit(1);
         }
     }
+    else if (args[0] === "feature") {
+        try {
+            await (0, feature_1.featureCommand)(args.slice(1), process.cwd());
+        }
+        catch (error) {
+            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
+            process.exit(1);
+        }
+    }
+    else if (args[0] === "decision") {
+        try {
+            await (0, decision_1.decisionCommand)(args.slice(1), process.cwd());
+        }
+        catch (error) {
+            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
+            process.exit(1);
+        }
+    }
+    else if (args[0] === "handoff") {
+        try {
+            await (0, handoff_1.handoffCommand)(args.slice(1), process.cwd());
+        }
+        catch (error) {
+            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
+            process.exit(1);
+        }
+    }
     else {
         console.error(`Error: Unknown command "${args[0]}"`);
         showHelp();
         process.exit(1);
     }
 }
-main();
+void main();

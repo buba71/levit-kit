@@ -2,6 +2,10 @@
   "name": "project-name",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "test": "node --test",
+    "eval": "ts-node evals/conformance.eval.ts"
+  },
   "dependencies": {},
   "devDependencies": {}
 }

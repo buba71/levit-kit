@@ -11,6 +11,10 @@ function exists(p: string) {
   return fs.existsSync(p);
 }
 
+function getCliPath() {
+  return path.join(process.cwd(), "dist", "bin", "cli.js");
+}
+
 test("levit init copies default template exactly", () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
@@ -71,6 +75,114 @@ test("CLI --help works", () => {
   const output = execSync("node dist/bin/cli.js --help").toString();
   assert.ok(output.includes("Usage: levit [command] [options]"));
   assert.ok(output.includes("init <project-name>"));
+});
+
+test("CLI feature new creates a feature intent file", () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "levit-kit-test-")
+  );
+
+  const projectName = "test-project";
+  const projectPath = path.join(tempDir, projectName);
+  initProject(projectName, projectPath);
+
+  const cliPath = getCliPath();
+
+  execSync(
+    `node ${cliPath} feature new --yes --id 001 --title "My Feature" --slug my-feature`,
+    { cwd: projectPath }
+  );
+
+  assert.ok(exists(path.join(projectPath, "features", "001-my-feature.md")));
+
+  fs.rmSync(tempDir, { recursive: true, force: true });
+});
+
+test("CLI feature new auto-assigns id when omitted", () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "levit-kit-test-")
+  );
+
+  const projectName = "test-project";
+  const projectPath = path.join(tempDir, projectName);
+  initProject(projectName, projectPath);
+
+  const cliPath = getCliPath();
+
+  execSync(
+    `node ${cliPath} feature new --yes --title "My Feature" --slug my-feature`,
+    { cwd: projectPath }
+  );
+
+  assert.ok(exists(path.join(projectPath, "features", "001-my-feature.md")));
+
+  fs.rmSync(tempDir, { recursive: true, force: true });
+});
+
+test("CLI decision new creates a decision record", () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "levit-kit-test-")
+  );
+
+  const projectName = "test-project";
+  const projectPath = path.join(tempDir, projectName);
+  initProject(projectName, projectPath);
+
+  const cliPath = getCliPath();
+
+  execSync(
+    `node ${cliPath} decision new --yes --id 001 --title "Choose DB" --feature features/001-some-feature.md`,
+    { cwd: projectPath }
+  );
+
+  assert.ok(exists(path.join(projectPath, ".levit", "decisions")));
+  assert.ok(exists(path.join(projectPath, ".levit", "decisions", "ADR-001-choose-db.md")));
+
+  fs.rmSync(tempDir, { recursive: true, force: true });
+});
+
+test("CLI decision new auto-assigns id when omitted", () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "levit-kit-test-")
+  );
+
+  const projectName = "test-project";
+  const projectPath = path.join(tempDir, projectName);
+  initProject(projectName, projectPath);
+
+  const cliPath = getCliPath();
+
+  execSync(
+    `node ${cliPath} decision new --yes --title "Auto ID Decision"`,
+    { cwd: projectPath }
+  );
+
+  assert.ok(exists(path.join(projectPath, ".levit", "decisions", "ADR-001-auto-id-decision.md")));
+
+  fs.rmSync(tempDir, { recursive: true, force: true });
+});
+
+test("CLI handoff new creates an agent handoff brief", () => {
+  const tempDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "levit-kit-test-")
+  );
+
+  const projectName = "test-project";
+  const projectPath = path.join(tempDir, projectName);
+  initProject(projectName, projectPath);
+
+  const cliPath = getCliPath();
+
+  execSync(
+    `node ${cliPath} handoff new --yes --feature features/001-some-feature.md --role security`,
+    { cwd: projectPath }
+  );
+
+  const handoffDir = path.join(projectPath, ".levit", "handoff");
+  assert.ok(exists(handoffDir));
+  assert.ok(fs.readdirSync(handoffDir).some((f) => f.endsWith("-security.md")));
+
+  fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
 test("CLI --version works", () => {
