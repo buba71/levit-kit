@@ -1,6 +1,6 @@
 # levit-kit
 
-Hybrid starter kit for **Antigravity** projects  
+Hybrid starter kit for **AI-Driven Development (AIDD)** projects  
 (template + CLI + agentic conventions)
 
 ---
@@ -22,7 +22,7 @@ Hybrid starter kit for **Antigravity** projects
 
 ## Why levit-kit exists
 
-Levit-kit provides a **clean, readable, and predictable starting point** for initiating projects with Google Antigravity.
+Levit-kit provides a **clean, readable, and predictable starting point** for initiating projects with **AI-Driven Development (AIDD)**.
 
 It does not attempt to automate development, orchestrate agents, or generate business logic.
 
@@ -64,6 +64,9 @@ npx @buba_71/levit init my-project
 ### Commands & Options
 
 - `init <name>`: Initializes a new project in the specified directory.
+- `feature new`: Creates a new feature intent (auto-assigns ID).
+- `decision new`: Creates a new Architecture Decision Record (ADR) (auto-assigns ID).
+- `handoff new`: Creates a workspace handoff brief for an agent.
 - `-v, --version`: Displays the current version.
 - `-h, --help`: Displays the help message.
 
@@ -83,11 +86,12 @@ Levit-kit does not remain in the project after initialization and installs no de
 
 Levit-kit installs a cognitive pipeline in your project:
 
-1.  **Human Intent**: You define *what* you want in `features/INTENT.md`.
+1.  **Human Intent**: You define *what* you want using `levit feature new`.
 2.  **Agent Onboarding**: Your AI reads `.levit/AGENT_ONBOARDING.md` to learn your rules.
-3.  **Collaborative Decision**: The agent proposes technical choices in `.levit/decision-record.md`.
-4.  **Verification**: You or the agent run quality tests in `evals/`.
-5.  **Review**: The agent submits its work following a strict protocol.
+3.  **Collaborative Decision**: The agent or human proposes technical choices using `levit decision new` (stored in `.levit/decisions/`).
+4.  **Handoff**: You package the task for an agent using `levit handoff new`.
+5.  **Verification**: You or the agent run quality tests in `evals/`.
+6.  **Review**: The agent submits its work following the protocol in `.levit/workflows/`.
 
 ---
 

@@ -11,8 +11,8 @@ It is designed for a **hybrid workspace** where Human vision leads and AI execut
 
 ### 2. The "Intent-First" Workflow
 When building a new feature, do not start with code:
-1.  **Declare Intent**: Copy `features/INTENT.md` to a new file (e.g., `features/001-my-feature.md`).
-2.  **Define Boundaries**: Fill in the "User Story" and especially the "Boundaries" section (what the AI must NOT touch).
+1.  **Declare Intent**: Run `levit feature new` and follow the prompts.
+2.  **Define Boundaries**: Open the generated file in `features/` and refine the "User Story" and "Boundaries" section.
 
 ### 3. Leading your Agents
 When using an AI agent (Antigravity, Cursor, etc.):
@@ -26,7 +26,7 @@ When using an AI agent (Antigravity, Cursor, etc.):
 This repository is built for **clarity over automation**:
 - **Explicit Structure**: No hidden magic.
 - **Human Sovereignty**: You make the final decisions.
-- **Traceability**: All technical choices are documented (see `.levit/decision-record.md`).
+- **Traceability**: All technical choices are documented (run `levit decision new` to create a record in `.levit/decisions/`).
 
 ## 📂 Navigation
 - `SOCIAL_CONTRACT.md`: Your ethical and operational foundations.

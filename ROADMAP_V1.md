@@ -2,7 +2,7 @@
 
 This document outlines the current state of Levit-Kit and the strategic path forward to becoming the standard for AI-Driven Development (AIDD) governance.
 
-## 🟢 Current State (v0.4.0-alpha)
+## 🟢 Current State (v0.4.0)
 
 We have successfully transformed Levit-Kit into an **AI-Aware Scaffolding tool**. 
 
@@ -11,10 +11,11 @@ We have successfully transformed Levit-Kit into an **AI-Aware Scaffolding tool**
 - **`.levit/prompts/`**: Centralized governance for AI behavior.
 - **`SOCIAL_CONTRACT.md`**: Formalized Human-AI collaboration rules.
 
-### 2. Intent-Driven Specification
-- **`features/INTENT.md`**: Human-first specification template.
+### 2. Intent-Driven Specification & Lifecycle CLI
+- **`levit feature new`**: Automated creation of human-first specifications.
 - **Boundaries Management**: Explicit "Out of Scope" sections to prevent AI drift.
-- **ADR for AI**: Decision Record templates for technical traceability.
+- **`levit decision new`**: ADR templates for technical traceability (stored in `.levit/decisions/`).
+- **`levit handoff new`**: Explicit context packaging for agent shifts.
 
 ### 3. Technical Empowerment
 - **`evals/`**: First-class support for AI quality testing.
