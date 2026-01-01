@@ -1,11 +1,8 @@
-import fs from "fs-extra";
-import path from "node:path";
 import readline from "node:readline/promises";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
-import { writeTextFile } from "../core/write_file";
-import { nextSequentialId } from "../core/ids";
+import { FeatureService } from "../services/feature_service";
 
 function normalizeSlug(input: string): string {
   return input
@@ -32,8 +29,6 @@ export async function featureCommand(argv: string[], cwd: string) {
   let slug = getStringFlag(flags, "slug");
   let id = getStringFlag(flags, "id");
 
-  const computedId = nextSequentialId(path.join(projectRoot, "features"), /^(\d+)-/);
-
   if (!yes) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
@@ -46,15 +41,7 @@ export async function featureCommand(argv: string[], cwd: string) {
       slug = (await rl.question(`Feature slug [${computed}]: `)).trim() || computed;
     }
 
-    if (!id) {
-      id = (await rl.question(`Feature id [${computedId}]: `)).trim() || computedId;
-    }
-
     await rl.close();
-  }
-
-  if (!id) {
-    id = computedId;
   }
 
   if (!title) {
@@ -64,24 +51,5 @@ export async function featureCommand(argv: string[], cwd: string) {
     throw new Error("Missing --slug");
   }
 
-  const fileName = `${id}-${slug}.md`;
-  const featurePath = path.join(projectRoot, "features", fileName);
-
-  const date = new Date().toISOString().split("T")[0];
-  const frontmatter = `---
-id: ${id}
-status: active
-owner: human
-last_updated: ${date}
-risk_level: low
-depends_on: []
----
-
-`;
-
-  const content = `${frontmatter}# INTENT: ${title}\n\n## 1. Vision (The "Why")\n- **User Story**: [fill]\n- **Priority**: [Low / Medium / High / Critical]\n\n## 2. Success Criteria (The "What")\n- [ ] Criterion 1\n\n## 3. Boundaries (The "No")\n- Non-goal 1\n\n## 4. Technical Constraints\n- [fill]\n\n## 5. Agent Task\n- [fill]\n`;
-
-  writeTextFile(featurePath, content, { overwrite });
-
-  process.stdout.write(`Created ${path.relative(projectRoot, featurePath)}\n`);
+  FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
 }

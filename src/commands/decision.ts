@@ -1,18 +1,8 @@
-import path from "node:path";
 import readline from "node:readline/promises";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
-import { writeTextFile } from "../core/write_file";
-import { nextSequentialId } from "../core/ids";
-
-function normalizeSlug(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-_]/g, "")
-    .replace(/\s+/g, "-");
-}
+import { DecisionService } from "../services/decision_service";
 
 export async function decisionCommand(argv: string[], cwd: string) {
   const { positional, flags } = parseArgs(argv);
@@ -31,8 +21,6 @@ export async function decisionCommand(argv: string[], cwd: string) {
   let id = getStringFlag(flags, "id");
   const featureRef = getStringFlag(flags, "feature");
 
-  const computedId = nextSequentialId(path.join(projectRoot, ".levit", "decisions"), /^ADR-(\d+)-/);
-
   if (!yes) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
@@ -40,45 +28,12 @@ export async function decisionCommand(argv: string[], cwd: string) {
       title = (await rl.question("Decision title: ")).trim();
     }
 
-    if (!id) {
-      id = (await rl.question(`Decision id [${computedId}]: `)).trim() || computedId;
-    }
-
     await rl.close();
-  }
-
-  if (!id) {
-    id = computedId;
   }
 
   if (!title) {
     throw new Error("Missing --title");
   }
-  if (!id) {
-    throw new Error("Missing --id");
-  }
 
-  const slug = normalizeSlug(title);
-  const fileName = `ADR-${id}-${slug}.md`;
-  const decisionPath = path.join(projectRoot, ".levit", "decisions", fileName);
-
-  const date = new Date().toISOString().split("T")[0];
-  const frontmatter = `---
-id: ADR-${id}
-status: draft
-owner: human
-last_updated: ${date}
-risk_level: low
-depends_on: [${featureRef || ""}]
----
-
-`;
-
-  const featureLine = featureRef ? `- **Feature**: ${featureRef}\n` : "";
-
-  const content = `${frontmatter}# ADR ${id}: ${title}\n\n- **Date**: ${date}\n- **Status**: [Draft / Proposed / Approved]\n${featureLine}\n## Context\n[fill]\n\n## Decision\n[fill]\n\n## Rationale\n[fill]\n\n## Alternatives Considered\n[fill]\n\n## Consequences\n[fill]\n`;
-
-  writeTextFile(decisionPath, content, { overwrite });
-
-  process.stdout.write(`Created ${path.relative(projectRoot, decisionPath)}\n`);
+  DecisionService.createDecision(projectRoot, { title, featureRef, id, overwrite });
 }

@@ -4,12 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.featureCommand = featureCommand;
-const node_path_1 = __importDefault(require("node:path"));
 const promises_1 = __importDefault(require("node:readline/promises"));
 const levit_project_1 = require("../core/levit_project");
 const cli_args_1 = require("../core/cli_args");
-const write_file_1 = require("../core/write_file");
-const ids_1 = require("../core/ids");
+const feature_service_1 = require("../services/feature_service");
 function normalizeSlug(input) {
     return input
         .trim()
@@ -29,7 +27,6 @@ async function featureCommand(argv, cwd) {
     let title = (0, cli_args_1.getStringFlag)(flags, "title");
     let slug = (0, cli_args_1.getStringFlag)(flags, "slug");
     let id = (0, cli_args_1.getStringFlag)(flags, "id");
-    const computedId = (0, ids_1.nextSequentialId)(node_path_1.default.join(projectRoot, "features"), /^(\d+)-/);
     if (!yes) {
         const rl = promises_1.default.createInterface({ input: process.stdin, output: process.stdout });
         if (!title) {
@@ -39,13 +36,7 @@ async function featureCommand(argv, cwd) {
             const computed = normalizeSlug(title || "");
             slug = (await rl.question(`Feature slug [${computed}]: `)).trim() || computed;
         }
-        if (!id) {
-            id = (await rl.question(`Feature id [${computedId}]: `)).trim() || computedId;
-        }
         await rl.close();
-    }
-    if (!id) {
-        id = computedId;
     }
     if (!title) {
         throw new Error("Missing --title");
@@ -53,20 +44,5 @@ async function featureCommand(argv, cwd) {
     if (!slug) {
         throw new Error("Missing --slug");
     }
-    const fileName = `${id}-${slug}.md`;
-    const featurePath = node_path_1.default.join(projectRoot, "features", fileName);
-    const date = new Date().toISOString().split("T")[0];
-    const frontmatter = `---
-id: ${id}
-status: active
-owner: human
-last_updated: ${date}
-risk_level: low
-depends_on: []
----
-
-`;
-    const content = `${frontmatter}# INTENT: ${title}\n\n## 1. Vision (The "Why")\n- **User Story**: [fill]\n- **Priority**: [Low / Medium / High / Critical]\n\n## 2. Success Criteria (The "What")\n- [ ] Criterion 1\n\n## 3. Boundaries (The "No")\n- Non-goal 1\n\n## 4. Technical Constraints\n- [fill]\n\n## 5. Agent Task\n- [fill]\n`;
-    (0, write_file_1.writeTextFile)(featurePath, content, { overwrite });
-    process.stdout.write(`Created ${node_path_1.default.relative(projectRoot, featurePath)}\n`);
+    feature_service_1.FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
 }

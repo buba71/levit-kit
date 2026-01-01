@@ -8,8 +8,11 @@ import { validateCommand } from "../src/commands/validate";
 import { getVersion } from "../src/core/version";
 import path from "node:path";
 
+import { Logger } from "../src/core/logger";
+import { LevitError } from "../src/core/errors";
+
 function showHelp() {
-  console.log(`
+  Logger.info(`
 Usage: levit [command] [options]
 
 Commands:
@@ -22,11 +25,16 @@ Commands:
 Options:
   -v, --version          Show version number
   -h, --help             Show help
+  --json                 Output in JSON format
 `);
 }
 
 async function main() {
   const args = process.argv.slice(2);
+
+  if (args.includes("--json")) {
+    Logger.setJsonMode(true);
+  }
 
   if (args.includes("-h") || args.includes("--help") || args.length === 0) {
     showHelp();
@@ -38,70 +46,45 @@ async function main() {
     process.exit(0);
   }
 
-  if (args[0] === "init") {
-    const projectName = args[1];
+  const command = args[0];
 
-    if (!projectName) {
-      console.error("Error: Project name is required.");
-      console.error("Usage: levit init <project-name>");
-      process.exit(1);
-    }
+  try {
+    switch (command) {
+      case "init":
+        const projectName = args[1];
+        if (!projectName) {
+          throw new Error("Project name is required. Usage: levit init <project-name>");
+        }
+        initProject(projectName, path.resolve(process.cwd(), projectName));
+        break;
 
-    // Basic validation: ensure it's a valid directory name
-    if (!/^[a-z0-9-_]+$/i.test(projectName)) {
-      console.error("Error: Invalid project name. Use only letters, numbers, dashes, and underscores.");
-      process.exit(1);
-    }
+      case "feature":
+        await featureCommand(args.slice(1), process.cwd());
+        break;
 
-    const targetPath = path.resolve(process.cwd(), projectName);
+      case "decision":
+        await decisionCommand(args.slice(1), process.cwd());
+        break;
 
-    try {
-      initProject(projectName, targetPath);
-    } catch (error) {
-      console.error(
-        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
-      );
-      process.exit(1);
+      case "handoff":
+        await handoffCommand(args.slice(1), process.cwd());
+        break;
+
+      case "validate":
+        await validateCommand(args.slice(1), process.cwd());
+        break;
+
+      default:
+        Logger.error(`Unknown command "${command}"`);
+        showHelp();
+        process.exit(1);
     }
-  } else if (args[0] === "feature") {
-    try {
-      await featureCommand(args.slice(1), process.cwd());
-    } catch (error) {
-      console.error(
-        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
-      );
-      process.exit(1);
+  } catch (error) {
+    if (error instanceof LevitError) {
+      Logger.error(`${error.message} (Code: ${error.code})`);
+    } else {
+      Logger.error(error instanceof Error ? error.message : "Unexpected error", error);
     }
-  } else if (args[0] === "decision") {
-    try {
-      await decisionCommand(args.slice(1), process.cwd());
-    } catch (error) {
-      console.error(
-        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
-      );
-      process.exit(1);
-    }
-  } else if (args[0] === "handoff") {
-    try {
-      await handoffCommand(args.slice(1), process.cwd());
-    } catch (error) {
-      console.error(
-        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
-      );
-      process.exit(1);
-    }
-  } else if (args[0] === "validate") {
-    try {
-      await validateCommand(args.slice(1), process.cwd());
-    } catch (error) {
-      console.error(
-        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
-      );
-      process.exit(1);
-    }
-  } else {
-    console.error(`Error: Unknown command "${args[0]}"`);
-    showHelp();
     process.exit(1);
   }
 }

@@ -11,8 +11,10 @@ const handoff_1 = require("../src/commands/handoff");
 const validate_1 = require("../src/commands/validate");
 const version_1 = require("../src/core/version");
 const node_path_1 = __importDefault(require("node:path"));
+const logger_1 = require("../src/core/logger");
+const errors_1 = require("../src/core/errors");
 function showHelp() {
-    console.log(`
+    logger_1.Logger.info(`
 Usage: levit [command] [options]
 
 Commands:
@@ -25,10 +27,14 @@ Commands:
 Options:
   -v, --version          Show version number
   -h, --help             Show help
+  --json                 Output in JSON format
 `);
 }
 async function main() {
     const args = process.argv.slice(2);
+    if (args.includes("--json")) {
+        logger_1.Logger.setJsonMode(true);
+    }
     if (args.includes("-h") || args.includes("--help") || args.length === 0) {
         showHelp();
         process.exit(0);
@@ -37,66 +43,41 @@ async function main() {
         console.log(`levit-kit v${(0, version_1.getVersion)()}`);
         process.exit(0);
     }
-    if (args[0] === "init") {
-        const projectName = args[1];
-        if (!projectName) {
-            console.error("Error: Project name is required.");
-            console.error("Usage: levit init <project-name>");
-            process.exit(1);
-        }
-        // Basic validation: ensure it's a valid directory name
-        if (!/^[a-z0-9-_]+$/i.test(projectName)) {
-            console.error("Error: Invalid project name. Use only letters, numbers, dashes, and underscores.");
-            process.exit(1);
-        }
-        const targetPath = node_path_1.default.resolve(process.cwd(), projectName);
-        try {
-            (0, init_1.initProject)(projectName, targetPath);
-        }
-        catch (error) {
-            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
-            process.exit(1);
-        }
-    }
-    else if (args[0] === "feature") {
-        try {
-            await (0, feature_1.featureCommand)(args.slice(1), process.cwd());
-        }
-        catch (error) {
-            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
-            process.exit(1);
+    const command = args[0];
+    try {
+        switch (command) {
+            case "init":
+                const projectName = args[1];
+                if (!projectName) {
+                    throw new Error("Project name is required. Usage: levit init <project-name>");
+                }
+                (0, init_1.initProject)(projectName, node_path_1.default.resolve(process.cwd(), projectName));
+                break;
+            case "feature":
+                await (0, feature_1.featureCommand)(args.slice(1), process.cwd());
+                break;
+            case "decision":
+                await (0, decision_1.decisionCommand)(args.slice(1), process.cwd());
+                break;
+            case "handoff":
+                await (0, handoff_1.handoffCommand)(args.slice(1), process.cwd());
+                break;
+            case "validate":
+                await (0, validate_1.validateCommand)(args.slice(1), process.cwd());
+                break;
+            default:
+                logger_1.Logger.error(`Unknown command "${command}"`);
+                showHelp();
+                process.exit(1);
         }
     }
-    else if (args[0] === "decision") {
-        try {
-            await (0, decision_1.decisionCommand)(args.slice(1), process.cwd());
+    catch (error) {
+        if (error instanceof errors_1.LevitError) {
+            logger_1.Logger.error(`${error.message} (Code: ${error.code})`);
         }
-        catch (error) {
-            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
-            process.exit(1);
+        else {
+            logger_1.Logger.error(error instanceof Error ? error.message : "Unexpected error", error);
         }
-    }
-    else if (args[0] === "handoff") {
-        try {
-            await (0, handoff_1.handoffCommand)(args.slice(1), process.cwd());
-        }
-        catch (error) {
-            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
-            process.exit(1);
-        }
-    }
-    else if (args[0] === "validate") {
-        try {
-            await (0, validate_1.validateCommand)(args.slice(1), process.cwd());
-        }
-        catch (error) {
-            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
-            process.exit(1);
-        }
-    }
-    else {
-        console.error(`Error: Unknown command "${args[0]}"`);
-        showHelp();
         process.exit(1);
     }
 }

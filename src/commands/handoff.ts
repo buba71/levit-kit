@@ -1,13 +1,8 @@
-import path from "node:path";
 import readline from "node:readline/promises";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
-import { writeTextFile } from "../core/write_file";
-
-function isoDate(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+import { HandoffService } from "../services/handoff_service";
 
 export async function handoffCommand(argv: string[], cwd: string) {
   const { positional, flags } = parseArgs(argv);
@@ -46,26 +41,5 @@ export async function handoffCommand(argv: string[], cwd: string) {
     role = "developer";
   }
 
-  const safeRole = role.trim().toLowerCase();
-  const date = isoDate();
-
-  const fileName = `${date}-${path.basename(feature, path.extname(feature))}-${safeRole}.md`;
-  const handoffPath = path.join(projectRoot, ".levit", "handoff", fileName);
-
-  const frontmatter = `---
-id: HAND-${date}-${safeRole}
-status: active
-owner: ${safeRole}
-last_updated: ${date}
-risk_level: low
-depends_on: [${feature}]
----
-
-`;
-
-  const content = `${frontmatter}# Agent Handoff\n\n- **Date**: ${date}\n- **Role**: ${safeRole}\n- **Feature**: ${feature}\n\n## What to read first\n- SOCIAL_CONTRACT.md\n- .levit/AGENT_ONBOARDING.md\n- ${feature}\n\n## Boundaries\nFollow the Boundaries section of the feature spec strictly.\n\n## Deliverables\n- A minimal, atomic diff\n- A short summary: what changed + why\n- How to verify (commands to run)\n- Open questions / risks\n\n## Review protocol\nFollow: .levit/workflows/submit-for-review.md\n`;
-
-  writeTextFile(handoffPath, content, { overwrite });
-
-  process.stdout.write(`Created ${path.relative(projectRoot, handoffPath)}\n`);
+  HandoffService.createHandoff(projectRoot, { feature, role, overwrite });
 }

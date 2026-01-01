@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { getTemplatePath } from "./core/paths";
+import { DEFAULT_MANIFEST } from "./types/manifest";
 
 /**
  * Core generation logic for a new project.
@@ -19,4 +20,13 @@ export function generateProject(targetPath: string, templateName: string = "defa
 
   fs.ensureDirSync(targetPath);
   fs.copySync(templatePath, targetPath);
+
+  fs.copySync(templatePath, targetPath);
+
+  // Generate levit.json manifest
+  const manifest = { ...DEFAULT_MANIFEST };
+  manifest.project.name = path.basename(targetPath);
+  
+  const manifestPath = path.join(targetPath, "levit.json");
+  fs.writeJsonSync(manifestPath, manifest, { spaces: 2 });
 }

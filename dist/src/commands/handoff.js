@@ -4,14 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handoffCommand = handoffCommand;
-const node_path_1 = __importDefault(require("node:path"));
 const promises_1 = __importDefault(require("node:readline/promises"));
 const levit_project_1 = require("../core/levit_project");
 const cli_args_1 = require("../core/cli_args");
-const write_file_1 = require("../core/write_file");
-function isoDate() {
-    return new Date().toISOString().slice(0, 10);
-}
+const handoff_service_1 = require("../services/handoff_service");
 async function handoffCommand(argv, cwd) {
     const { positional, flags } = (0, cli_args_1.parseArgs)(argv);
     const sub = positional[0];
@@ -39,21 +35,5 @@ async function handoffCommand(argv, cwd) {
     if (!role) {
         role = "developer";
     }
-    const safeRole = role.trim().toLowerCase();
-    const date = isoDate();
-    const fileName = `${date}-${node_path_1.default.basename(feature, node_path_1.default.extname(feature))}-${safeRole}.md`;
-    const handoffPath = node_path_1.default.join(projectRoot, ".levit", "handoff", fileName);
-    const frontmatter = `---
-id: HAND-${date}-${safeRole}
-status: active
-owner: ${safeRole}
-last_updated: ${date}
-risk_level: low
-depends_on: [${feature}]
----
-
-`;
-    const content = `${frontmatter}# Agent Handoff\n\n- **Date**: ${date}\n- **Role**: ${safeRole}\n- **Feature**: ${feature}\n\n## What to read first\n- SOCIAL_CONTRACT.md\n- .levit/AGENT_ONBOARDING.md\n- ${feature}\n\n## Boundaries\nFollow the Boundaries section of the feature spec strictly.\n\n## Deliverables\n- A minimal, atomic diff\n- A short summary: what changed + why\n- How to verify (commands to run)\n- Open questions / risks\n\n## Review protocol\nFollow: .levit/workflows/submit-for-review.md\n`;
-    (0, write_file_1.writeTextFile)(handoffPath, content, { overwrite });
-    process.stdout.write(`Created ${node_path_1.default.relative(projectRoot, handoffPath)}\n`);
+    handoff_service_1.HandoffService.createHandoff(projectRoot, { feature, role, overwrite });
 }

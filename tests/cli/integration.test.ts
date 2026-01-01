@@ -5,7 +5,7 @@ import path from "node:path";
 import os from "node:os";
 import { execSync } from "node:child_process";
 
-import { initProject } from "../src/commands/init";
+import { initProject } from "../../src/commands/init";
 
 function exists(p: string) {
   return fs.existsSync(p);
