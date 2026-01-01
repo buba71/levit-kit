@@ -37,6 +37,8 @@ We will generally reject contributions that:
 - **Test**: `npm run test`
 - **Link locally**: You can use `npm link` to test the `levit` command locally.
 
+For details on the internal architecture, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 ---
 
 > "Levit-kit does not aim to save time. It aims to prevent losing time later."

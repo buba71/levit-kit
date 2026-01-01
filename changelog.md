@@ -7,6 +7,34 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
+---
+
+## [0.5.0] – 2026-01-01
+
+### Added
+- **V2 Architecture**: Layered architecture with clear separation between Commands, Services, and Types
+- **Machine-Readable Manifest**: `levit.json` generated for every project with governance rules, features, roles, and constraints
+- **Structured Error Handling**: `LevitError` with typed error codes for machine-readable errors
+- **Standardized Logging**: Centralized `Logger` with JSON output mode (`--json` flag)
+- **Validation Command**: `levit validate` to check project structure and cognitive scaffolding
+- **ManifestService**: Automatic discovery and syncing of features and roles from filesystem
+- **Comprehensive Test Suite**: 24 tests (9 integration + 15 unit tests) organized by layer
+
+### Changed
+- **Services Layer**: All business logic extracted to pure services (FeatureService, DecisionService, HandoffService, ValidationService)
+- **Commands Layer**: CLI commands now thin wrappers that delegate to services
+- **Test Structure**: Tests reorganized into `tests/cli/` (integration) and `tests/services/` (unit)
+- **Build Artifacts**: `dist/` removed from version control, generated on publish via `prepublishOnly`
+- **Documentation**: Updated README.md, created ARCHITECTURE.md, updated CONTRIBUTING.md
+
+### Technical Improvements
+- Strong typing for all domain concepts (Feature, Decision, Handoff)
+- ValidationService returns structured results instead of exiting
+- All output goes through Logger (supports human and JSON modes)
+- Services are pure functions (no side effects, testable in isolation)
+
+---
+
 ## [0.4.0] – 2025-12-31
 
 ### Added

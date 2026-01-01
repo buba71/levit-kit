@@ -67,6 +67,8 @@ npx @buba_71/levit init my-project
 - `feature new`: Creates a new feature intent (auto-assigns ID).
 - `decision new`: Creates a new Architecture Decision Record (ADR) (auto-assigns ID).
 - `handoff new`: Creates a workspace handoff brief for an agent.
+- `validate`: Validates project structure and cognitive scaffolding.
+- `--json`: Outputs machine-readable JSON (works with all commands).
 - `-v, --version`: Displays the current version.
 - `-h, --help`: Displays the help message.
 
@@ -75,10 +77,19 @@ npx @buba_71/levit init my-project
 The `init` command:
 1. Creates a new project directory.
 2. Copies the **default levit-kit template**.
-3. Includes a base `.gitignore` and `package.json`.
-4. Exits immediately.
+3. Generates a **`levit.json` manifest** with project metadata, governance rules, discovered roles, and constraints.
+4. Includes a base `.gitignore` and `package.json`.
+5. Exits immediately.
+
+The `levit.json` file serves as the **central machine-readable contract** for AI agents, containing:
+- Project name and description
+- Governance settings (autonomy level, risk tolerance)
+- Active features and available roles
+- Technical constraints (file size limits, allowed dependencies, forbidden patterns)
+- Paths to key directories
 
 Levit-kit does not remain in the project after initialization and installs no dependencies.
+
 
 ---
 
