@@ -19,6 +19,7 @@
   "main": "dist/src/init.js",
   "scripts": {
     "build": "tsc && chmod +x dist/bin/cli.js",
+    "prepublishOnly": "npm run build",
     "start": "node dist/bin/cli.js",
     "test": "npm run build && node --test dist/tests"
   },

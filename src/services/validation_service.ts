@@ -1,11 +1,29 @@
 import fs from "fs-extra";
 import path from "node:path";
+import { LevitError, LevitErrorCode } from "../core/errors";
+
+export interface ValidationIssue {
+  type: "error" | "warning";
+  code: string;
+  message: string;
+  file?: string;
+  details?: any;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  issues: ValidationIssue[];
+  metrics: {
+    errors: number;
+    warnings: number;
+    filesScanned: number;
+  };
+}
 
 export class ValidationService {
-  static validate(projectRoot: string): void {
-      console.log("🔍 Validating project cognitive scaffolding...");
-      let errors = 0;
-      let warnings = 0;
+  static validate(projectRoot: string): ValidationResult {
+      const issues: ValidationIssue[] = [];
+      let filesScanned = 0;
 
       // 1. Check core files
       const coreFiles = [
@@ -15,10 +33,12 @@ export class ValidationService {
       ];
       for (const file of coreFiles) {
         if (!fs.existsSync(path.join(projectRoot, file))) {
-          console.error(`❌ Missing core file: ${file}`);
-          errors++;
-        } else {
-          console.log(`✅ Core file found: ${file}`);
+          issues.push({
+            type: "error",
+            code: LevitErrorCode.MISSING_FILE,
+            message: `Missing core file: ${file}`,
+            file
+          });
         }
       }
 
@@ -26,8 +46,12 @@ export class ValidationService {
       const coreDirs = ["features", ".levit/decisions", ".levit/handoff"];
       for (const dir of coreDirs) {
         if (!fs.existsSync(path.join(projectRoot, dir))) {
-          console.error(`❌ Missing directory: ${dir}`);
-          errors++;
+          issues.push({
+            type: "error",
+            code: LevitErrorCode.MISSING_DIRECTORY,
+            message: `Missing directory: ${dir}`,
+            file: dir
+          });
         }
       }
 
@@ -35,20 +59,33 @@ export class ValidationService {
       const featuresPath = path.join(projectRoot, "features");
       if (fs.existsSync(featuresPath)) {
         const files = fs.readdirSync(featuresPath).filter((f) => f.endsWith(".md") && f !== "README.md");
+        filesScanned += files.length;
         if (files.length === 0) {
-          console.warn("⚠️ No features found in features/");
-          warnings++;
+          issues.push({
+            type: "warning",
+            code: "NO_FEATURES",
+            message: "No features found in features/",
+            file: "features/"
+          });
         } else {
           for (const file of files) {
             const content = fs.readFileSync(path.join(featuresPath, file), "utf8");
             const { valid, missing } = this.hasValidFrontmatter(content, "feature");
             if (!valid) {
-              console.error(`❌ Feature ${file} has invalid frontmatter. Missing: ${missing.join(", ")}`);
-              errors++;
+              issues.push({
+                type: "error",
+                code: LevitErrorCode.INVALID_FRONTMATTER,
+                message: `Feature ${file} has invalid frontmatter. Missing: ${missing.join(", ")}`,
+                file: path.join("features", file)
+              });
             }
             if (!content.includes("# INTENT:")) {
-              console.error(`❌ Feature ${file} is missing an # INTENT header.`);
-              errors++;
+              issues.push({
+                type: "error",
+                code: "INVALID_STRUCTURE",
+                message: `Feature ${file} is missing an # INTENT header.`,
+                file: path.join("features", file)
+              });
             }
           }
         }
@@ -58,12 +95,17 @@ export class ValidationService {
       const decisionsPath = path.join(projectRoot, ".levit/decisions");
       if (fs.existsSync(decisionsPath)) {
         const files = fs.readdirSync(decisionsPath).filter((f) => f.endsWith(".md") && f !== "README.md");
+        filesScanned += files.length;
         for (const file of files) {
           const content = fs.readFileSync(path.join(decisionsPath, file), "utf8");
           const { valid, missing } = this.hasValidFrontmatter(content, "decision");
           if (!valid) {
-            console.error(`❌ Decision ${file} has invalid frontmatter. Missing: ${missing.join(", ")}`);
-            errors++;
+            issues.push({
+              type: "error",
+              code: LevitErrorCode.INVALID_FRONTMATTER,
+              message: `Decision ${file} has invalid frontmatter. Missing: ${missing.join(", ")}`,
+              file: path.join(".levit/decisions", file)
+            });
           }
         }
       }
@@ -72,25 +114,33 @@ export class ValidationService {
       const handoffsPath = path.join(projectRoot, ".levit/handoff");
       if (fs.existsSync(handoffsPath)) {
         const files = fs.readdirSync(handoffsPath).filter((f) => f.endsWith(".md") && f !== "README.md");
+        filesScanned += files.length;
         for (const file of files) {
           const content = fs.readFileSync(path.join(handoffsPath, file), "utf8");
           const { valid, missing } = this.hasValidFrontmatter(content, "handoff");
           if (!valid) {
-            console.error(`❌ Handoff ${file} has invalid frontmatter. Missing: ${missing.join(", ")}`);
-            errors++;
+            issues.push({
+              type: "error",
+              code: LevitErrorCode.INVALID_FRONTMATTER,
+              message: `Handoff ${file} has invalid frontmatter. Missing: ${missing.join(", ")}`,
+              file: path.join(".levit/handoff", file)
+            });
           }
         }
       }
 
-      console.log("");
-      if (errors > 0) {
-        console.error(`❌ Validation failed with ${errors} errors and ${warnings} warnings.`);
-        process.exit(1);
-      } else if (warnings > 0) {
-        console.log(`✨ Validation passed with ${warnings} warnings.`);
-      } else {
-        console.log("✨ All cognitive scaffolding checks passed!");
-      }
+      const errorCount = issues.filter(i => i.type === "error").length;
+      const warningCount = issues.filter(i => i.type === "warning").length;
+
+      return {
+        valid: errorCount === 0,
+        issues,
+        metrics: {
+          errors: errorCount,
+          warnings: warningCount,
+          filesScanned
+        }
+      };
   }
 
   private static hasValidFrontmatter(content: string, type: "feature" | "decision" | "handoff"): { valid: boolean; missing: string[] } {
