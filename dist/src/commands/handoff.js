@@ -43,7 +43,17 @@ async function handoffCommand(argv, cwd) {
     const date = isoDate();
     const fileName = `${date}-${node_path_1.default.basename(feature, node_path_1.default.extname(feature))}-${safeRole}.md`;
     const handoffPath = node_path_1.default.join(projectRoot, ".levit", "handoff", fileName);
-    const content = `# Agent Handoff\n\n- **Date**: ${date}\n- **Role**: ${safeRole}\n- **Feature**: ${feature}\n\n## What to read first\n- SOCIAL_CONTRACT.md\n- .levit/AGENT_ONBOARDING.md\n- ${feature}\n\n## Boundaries\nFollow the Boundaries section of the feature spec strictly.\n\n## Deliverables\n- A minimal, atomic diff\n- A short summary: what changed + why\n- How to verify (commands to run)\n- Open questions / risks\n\n## Review protocol\nFollow: .levit/workflows/submit-for-review.md\n`;
+    const frontmatter = `---
+id: HAND-${date}-${safeRole}
+status: active
+owner: ${safeRole}
+last_updated: ${date}
+risk_level: low
+depends_on: [${feature}]
+---
+
+`;
+    const content = `${frontmatter}# Agent Handoff\n\n- **Date**: ${date}\n- **Role**: ${safeRole}\n- **Feature**: ${feature}\n\n## What to read first\n- SOCIAL_CONTRACT.md\n- .levit/AGENT_ONBOARDING.md\n- ${feature}\n\n## Boundaries\nFollow the Boundaries section of the feature spec strictly.\n\n## Deliverables\n- A minimal, atomic diff\n- A short summary: what changed + why\n- How to verify (commands to run)\n- Open questions / risks\n\n## Review protocol\nFollow: .levit/workflows/submit-for-review.md\n`;
     (0, write_file_1.writeTextFile)(handoffPath, content, { overwrite });
     process.stdout.write(`Created ${node_path_1.default.relative(projectRoot, handoffPath)}\n`);
 }

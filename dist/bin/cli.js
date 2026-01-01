@@ -8,6 +8,7 @@ const init_1 = require("../src/commands/init");
 const decision_1 = require("../src/commands/decision");
 const feature_1 = require("../src/commands/feature");
 const handoff_1 = require("../src/commands/handoff");
+const validate_1 = require("../src/commands/validate");
 const version_1 = require("../src/core/version");
 const node_path_1 = __importDefault(require("node:path"));
 function showHelp() {
@@ -19,6 +20,7 @@ Commands:
   feature new            Create a new feature intent file (wizard)
   decision new           Create a new decision record (wizard)
   handoff new            Create an agent handoff brief (wizard)
+  validate               Validate project cognitive scaffolding (cognitive linter)
 
 Options:
   -v, --version          Show version number
@@ -77,6 +79,15 @@ async function main() {
     else if (args[0] === "handoff") {
         try {
             await (0, handoff_1.handoffCommand)(args.slice(1), process.cwd());
+        }
+        catch (error) {
+            console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");
+            process.exit(1);
+        }
+    }
+    else if (args[0] === "validate") {
+        try {
+            await (0, validate_1.validateCommand)(args.slice(1), process.cwd());
         }
         catch (error) {
             console.error(error instanceof Error ? `Error: ${error.message}` : "Unexpected error");

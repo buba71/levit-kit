@@ -62,9 +62,21 @@ export async function decisionCommand(argv: string[], cwd: string) {
   const fileName = `ADR-${id}-${slug}.md`;
   const decisionPath = path.join(projectRoot, ".levit", "decisions", fileName);
 
+  const date = new Date().toISOString().split("T")[0];
+  const frontmatter = `---
+id: ADR-${id}
+status: draft
+owner: human
+last_updated: ${date}
+risk_level: low
+depends_on: [${featureRef || ""}]
+---
+
+`;
+
   const featureLine = featureRef ? `- **Feature**: ${featureRef}\n` : "";
 
-  const content = `# ADR ${id}: ${title}\n\n- **Date**: [YYYY-MM-DD]\n- **Status**: [Draft / Proposed / Approved]\n${featureLine}\n## Context\n[fill]\n\n## Decision\n[fill]\n\n## Rationale\n[fill]\n\n## Alternatives Considered\n[fill]\n\n## Consequences\n[fill]\n`;
+  const content = `${frontmatter}# ADR ${id}: ${title}\n\n- **Date**: ${date}\n- **Status**: [Draft / Proposed / Approved]\n${featureLine}\n## Context\n[fill]\n\n## Decision\n[fill]\n\n## Rationale\n[fill]\n\n## Alternatives Considered\n[fill]\n\n## Consequences\n[fill]\n`;
 
   writeTextFile(decisionPath, content, { overwrite });
 

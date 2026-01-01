@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handoffCommand = exports.decisionCommand = exports.featureCommand = exports.initProject = void 0;
+exports.validateCommand = exports.handoffCommand = exports.decisionCommand = exports.featureCommand = exports.initProject = void 0;
 var init_1 = require("./init");
 Object.defineProperty(exports, "initProject", { enumerable: true, get: function () { return init_1.initProject; } });
 var feature_1 = require("./feature");
@@ -9,3 +9,5 @@ var decision_1 = require("./decision");
 Object.defineProperty(exports, "decisionCommand", { enumerable: true, get: function () { return decision_1.decisionCommand; } });
 var handoff_1 = require("./handoff");
 Object.defineProperty(exports, "handoffCommand", { enumerable: true, get: function () { return handoff_1.handoffCommand; } });
+var validate_1 = require("./validate");
+Object.defineProperty(exports, "validateCommand", { enumerable: true, get: function () { return validate_1.validateCommand; } });

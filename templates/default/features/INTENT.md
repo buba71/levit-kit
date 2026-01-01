@@ -1,3 +1,12 @@
+---
+id: FEATURE-ID
+status: active
+owner: human
+last_updated: 2025-01-12
+risk_level: medium
+depends_on: []
+---
+
 # INTENT: [Feature Name]
 
 > Copy this file to create a new feature specification.

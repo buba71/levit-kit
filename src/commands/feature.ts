@@ -67,7 +67,19 @@ export async function featureCommand(argv: string[], cwd: string) {
   const fileName = `${id}-${slug}.md`;
   const featurePath = path.join(projectRoot, "features", fileName);
 
-  const content = `# INTENT: ${title}\n\n## 1. Vision (The \"Why\")\n- **User Story**: [fill]\n- **Priority**: [Low / Medium / High / Critical]\n\n## 2. Success Criteria (The \"What\")\n- [ ] Criterion 1\n\n## 3. Boundaries (The \"No\")\n- Non-goal 1\n\n## 4. Technical Constraints\n- [fill]\n\n## 5. Agent Task\n- [fill]\n`;
+  const date = new Date().toISOString().split("T")[0];
+  const frontmatter = `---
+id: ${id}
+status: active
+owner: human
+last_updated: ${date}
+risk_level: low
+depends_on: []
+---
+
+`;
+
+  const content = `${frontmatter}# INTENT: ${title}\n\n## 1. Vision (The "Why")\n- **User Story**: [fill]\n- **Priority**: [Low / Medium / High / Critical]\n\n## 2. Success Criteria (The "What")\n- [ ] Criterion 1\n\n## 3. Boundaries (The "No")\n- Non-goal 1\n\n## 4. Technical Constraints\n- [fill]\n\n## 5. Agent Task\n- [fill]\n`;
 
   writeTextFile(featurePath, content, { overwrite });
 

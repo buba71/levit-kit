@@ -34,7 +34,7 @@ function getCliPath() {
     // AIDD assertions
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit")), ".levit directory should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "AGENT_ONBOARDING.md")), "AGENT_ONBOARDING.md should exist");
-    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "decision-record.md")), "decision-record.md should exist");
+    node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "AGENT_CONTRACT.md")), "AGENT_CONTRACT.md should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "example-task.md")), "Example workflow should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "workflows", "submit-for-review.md")), "Submit for review workflow should exist");
     node_assert_1.default.ok(exists(node_path_1.default.join(projectPath, ".levit", "prompts")), "Prompts directory should exist");

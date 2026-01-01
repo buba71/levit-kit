@@ -4,6 +4,7 @@ import { initProject } from "../src/commands/init";
 import { decisionCommand } from "../src/commands/decision";
 import { featureCommand } from "../src/commands/feature";
 import { handoffCommand } from "../src/commands/handoff";
+import { validateCommand } from "../src/commands/validate";
 import { getVersion } from "../src/core/version";
 import path from "node:path";
 
@@ -16,6 +17,7 @@ Commands:
   feature new            Create a new feature intent file (wizard)
   decision new           Create a new decision record (wizard)
   handoff new            Create an agent handoff brief (wizard)
+  validate               Validate project cognitive scaffolding (cognitive linter)
 
 Options:
   -v, --version          Show version number
@@ -82,6 +84,15 @@ async function main() {
   } else if (args[0] === "handoff") {
     try {
       await handoffCommand(args.slice(1), process.cwd());
+    } catch (error) {
+      console.error(
+        error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
+      );
+      process.exit(1);
+    }
+  } else if (args[0] === "validate") {
+    try {
+      await validateCommand(args.slice(1), process.cwd());
     } catch (error) {
       console.error(
         error instanceof Error ? `Error: ${error.message}` : "Unexpected error"
