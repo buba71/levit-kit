@@ -10,7 +10,7 @@ export interface CreateFeatureOptions {
 }
 
 export class FeatureService {
-  static createFeature(projectRoot: string, options: CreateFeatureOptions): void {
+  static createFeature(projectRoot: string, options: CreateFeatureOptions): string {
     const { title, slug, overwrite } = options;
     let { id } = options;
 
@@ -42,6 +42,6 @@ depends_on: []
 
     writeTextFile(featurePath, content, { overwrite: !!overwrite });
     
-    process.stdout.write(`Created ${path.relative(projectRoot, featurePath)}\n`);
+    return path.relative(projectRoot, featurePath);
   }
 }

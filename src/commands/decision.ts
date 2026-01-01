@@ -2,6 +2,7 @@ import readline from "node:readline/promises";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
+import { Logger } from "../core/logger";
 import { DecisionService } from "../services/decision_service";
 
 export async function decisionCommand(argv: string[], cwd: string) {
@@ -35,5 +36,6 @@ export async function decisionCommand(argv: string[], cwd: string) {
     throw new Error("Missing --title");
   }
 
-  DecisionService.createDecision(projectRoot, { title, featureRef, id, overwrite });
+  const createdPath = DecisionService.createDecision(projectRoot, { title, featureRef, id, overwrite });
+  Logger.info(`Created ${createdPath}`);
 }

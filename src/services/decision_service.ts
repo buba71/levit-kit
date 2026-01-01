@@ -18,7 +18,7 @@ function normalizeSlug(input: string): string {
 }
 
 export class DecisionService {
-  static createDecision(projectRoot: string, options: CreateDecisionOptions): void {
+  static createDecision(projectRoot: string, options: CreateDecisionOptions): string {
      const { title, featureRef, overwrite } = options;
      let { id } = options;
 
@@ -50,7 +50,7 @@ depends_on: [${featureRef || ""}]
      const content = `${frontmatter}# ADR ${id}: ${title}\n\n- **Date**: ${date}\n- **Status**: [Draft / Proposed / Approved]\n${featureLine}\n## Context\n[fill]\n\n## Decision\n[fill]\n\n## Rationale\n[fill]\n\n## Alternatives Considered\n[fill]\n\n## Consequences\n[fill]\n`;
 
      writeTextFile(decisionPath, content, { overwrite: !!overwrite });
-
-     process.stdout.write(`Created ${path.relative(projectRoot, decisionPath)}\n`);
+     
+     return path.relative(projectRoot, decisionPath);
   }
 }

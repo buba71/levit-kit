@@ -2,6 +2,7 @@ import readline from "node:readline/promises";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
+import { Logger } from "../core/logger";
 import { FeatureService } from "../services/feature_service";
 
 function normalizeSlug(input: string): string {
@@ -51,5 +52,6 @@ export async function featureCommand(argv: string[], cwd: string) {
     throw new Error("Missing --slug");
   }
 
-  FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
+  const createdPath = FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
+  Logger.info(`Created ${createdPath}`);
 }

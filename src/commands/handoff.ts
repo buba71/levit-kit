@@ -2,6 +2,7 @@ import readline from "node:readline/promises";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
+import { Logger } from "../core/logger";
 import { HandoffService } from "../services/handoff_service";
 
 export async function handoffCommand(argv: string[], cwd: string) {
@@ -41,5 +42,6 @@ export async function handoffCommand(argv: string[], cwd: string) {
     role = "developer";
   }
 
-  HandoffService.createHandoff(projectRoot, { feature, role, overwrite });
+  const createdPath = HandoffService.createHandoff(projectRoot, { feature, role, overwrite });
+  Logger.info(`Created ${createdPath}`);
 }

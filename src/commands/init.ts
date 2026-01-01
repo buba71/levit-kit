@@ -18,10 +18,10 @@ export function initProject(projectName: string, targetPath: string) {
 
   Logger.info(`🚀 levit-kit v${version}`);
   Logger.info(`✨ Project "${projectName}" is ready for development.`);
-  console.log("");
-  console.log("Next steps:");
-  console.log(`  1. cd ${projectName}`);
-  console.log("  2. Read README.md for the Human Operator Guide");
-  console.log("  3. Onboard your AI in .levit/AGENT_ONBOARDING.md");
-  console.log("");
+  Logger.info("");
+  Logger.info("Next steps:");
+  Logger.info(`  1. cd ${projectName}`);
+  Logger.info("  2. Read README.md for the Human Operator Guide");
+  Logger.info("  3. Onboard your AI in .levit/AGENT_ONBOARDING.md");
+  Logger.info("");
 }
