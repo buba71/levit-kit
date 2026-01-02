@@ -1,6 +1,12 @@
 import path from "node:path";
+import fs from "fs-extra";
+import yaml from "js-yaml";
 import { writeTextFile } from "../core/write_file";
 import { nextSequentialId } from "../core/ids";
+import { ManifestService } from "./manifest_service";
+import { parseFrontmatter } from "../core/frontmatter";
+import { FeatureRef } from "../types/manifest";
+import { LevitError, LevitErrorCode } from "../core/errors";
 
 export interface CreateFeatureOptions {
   title: string;
@@ -42,6 +48,80 @@ depends_on: []
 
     writeTextFile(featurePath, content, { overwrite: !!overwrite });
     
+    // Auto-sync manifest after feature creation
+    ManifestService.sync(projectRoot);
+    
     return path.relative(projectRoot, featurePath);
+  }
+
+  /**
+   * Lists all features from the manifest.
+   */
+  static listFeatures(projectRoot: string): FeatureRef[] {
+    const manifest = ManifestService.read(projectRoot);
+    return manifest.features;
+  }
+
+  /**
+   * Updates the status of a feature.
+   */
+  static updateFeatureStatus(
+    projectRoot: string,
+    featureId: string,
+    newStatus: 'active' | 'draft' | 'deprecated' | 'completed'
+  ): void {
+    const manifest = ManifestService.read(projectRoot);
+    const feature = manifest.features.find(f => f.id === featureId);
+
+    if (!feature) {
+      throw new LevitError(
+        LevitErrorCode.VALIDATION_FAILED,
+        `Feature with ID "${featureId}" not found`
+      );
+    }
+
+    // Update the feature file
+    const featurePath = path.join(projectRoot, feature.path);
+    if (!fs.existsSync(featurePath)) {
+      throw new LevitError(
+        LevitErrorCode.MISSING_FILE,
+        `Feature file not found: ${feature.path}`
+      );
+    }
+
+    const content = fs.readFileSync(featurePath, "utf-8");
+    const lines = content.split("\n");
+    
+    // Find frontmatter section
+    const frontmatterStart = lines.findIndex(l => l.trim() === "---");
+    if (frontmatterStart === -1) {
+      throw new LevitError(
+        LevitErrorCode.INVALID_FRONTMATTER,
+        `Feature file ${feature.path} has no frontmatter`
+      );
+    }
+
+    const frontmatterEnd = lines.slice(frontmatterStart + 1).findIndex(l => l.trim() === "---");
+    if (frontmatterEnd === -1) {
+      throw new LevitError(
+        LevitErrorCode.INVALID_FRONTMATTER,
+        `Feature file ${feature.path} has invalid frontmatter`
+      );
+    }
+
+    // Parse and update frontmatter
+    const frontmatter = parseFrontmatter(content);
+    frontmatter.status = newStatus;
+    frontmatter.last_updated = new Date().toISOString().split("T")[0];
+
+    // Rebuild frontmatter as YAML
+    const frontmatterYaml = yaml.dump(frontmatter, { lineWidth: -1, noRefs: true });
+    
+    // Reconstruct file
+    const newContent = `---\n${frontmatterYaml}---\n\n${lines.slice(frontmatterStart + frontmatterEnd + 2).join("\n")}`;
+    fs.writeFileSync(featurePath, newContent, "utf-8");
+
+    // Sync manifest
+    ManifestService.sync(projectRoot);
   }
 }

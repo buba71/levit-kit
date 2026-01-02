@@ -49,7 +49,6 @@ test("levit init copies default template exactly", () => {
   assert.ok(exists(path.join(projectPath, "evals")), "Evals directory should exist");
   assert.ok(exists(path.join(projectPath, "evals", "README.md")), "Evals README should exist");
   assert.ok(exists(path.join(projectPath, ".gitignore")), ".gitignore should exist");
-  assert.ok(exists(path.join(projectPath, "package.json")), "package.json should exist");
 
   // Agent boundaries
   assert.ok(

@@ -58,13 +58,22 @@ These limits are intentional.
 Levit-kit is used **once**, at the very beginning of a project.
 
 ```bash
+# Default template (generic)
+npx @buba_71/levit init my-project
+
+# Symfony template
+npx @buba_71/levit init my-project symfony
+
+# Interactive template selection (if multiple templates available)
 npx @buba_71/levit init my-project
 ```
 
 ### Commands & Options
 
-- `init <name>`: Initializes a new project in the specified directory.
+- `init <name> [template]`: Initializes a new project in the specified directory. Optionally specify a template (default, symfony).
 - `feature new`: Creates a new feature intent (auto-assigns ID).
+- `feature list`: Lists all features with their status.
+- `feature status <id> <status>`: Updates a feature's status.
 - `decision new`: Creates a new Architecture Decision Record (ADR) (auto-assigns ID).
 - `handoff new`: Creates a workspace handoff brief for an agent.
 - `validate`: Validates project structure and cognitive scaffolding.
@@ -72,14 +81,27 @@ npx @buba_71/levit init my-project
 - `-v, --version`: Displays the current version.
 - `-h, --help`: Displays the help message.
 
+### Available Templates
+
+- **default**: Generic template for any type of project (structure only)
+- **symfony**: Template with Symfony-specific guidelines in `.levit/AGENT_ONBOARDING.md` (structure only)
+
+> **Important**: Templates provide **structure and governance**, not business logic or framework files.
+> For Symfony projects, create your Symfony application separately (e.g., `composer create-project symfony/skeleton`)
+> and integrate it with the Levit-Kit structure.
+
 ### What happens during init?
 
 The `init` command:
 1. Creates a new project directory.
-2. Copies the **default levit-kit template**.
+2. Copies the **levit-kit template** (structure only, no business logic).
 3. Generates a **`levit.json` manifest** with project metadata, governance rules, discovered roles, and constraints.
-4. Includes a base `.gitignore` and `package.json`.
+4. Includes a base `.gitignore`.
 5. Exits immediately.
+
+> **Note**: Templates provide only the **AIDD governance structure** (`.levit/`, `features/`, etc.), 
+> not project-specific configuration files. You should create your project files (package.json, composer.json, etc.) 
+> separately according to your needs.
 
 The `levit.json` file serves as the **central machine-readable contract** for AI agents, containing:
 - Project name and description

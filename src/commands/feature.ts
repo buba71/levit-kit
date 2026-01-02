@@ -18,15 +18,33 @@ export async function featureCommand(argv: string[], cwd: string) {
   const { positional, flags } = parseArgs(argv);
 
   const sub = positional[0];
-  if (sub !== "new") {
-    throw new LevitError(
-      LevitErrorCode.INVALID_COMMAND,
-      'Usage: levit feature new [--title "..."] [--slug "..."] [--id "001"]'
-    );
-  }
-
   const projectRoot = requireLevitProjectRoot(cwd);
 
+  switch (sub) {
+    case "new":
+      await handleFeatureNew(projectRoot, flags);
+      break;
+
+    case "list":
+      handleFeatureList(projectRoot, flags);
+      break;
+
+    case "status":
+      await handleFeatureStatus(projectRoot, positional.slice(1), flags);
+      break;
+
+    default:
+      throw new LevitError(
+        LevitErrorCode.INVALID_COMMAND,
+        'Usage: levit feature <new|list|status> [options]\n' +
+        '  new: Create a new feature\n' +
+        '  list: List all features\n' +
+        '  status: Update feature status (usage: levit feature status <id> <status>)'
+      );
+  }
+}
+
+async function handleFeatureNew(projectRoot: string, flags: Record<string, string | boolean>) {
   const yes = getBooleanFlag(flags, "yes");
   const overwrite = getBooleanFlag(flags, "force");
 
@@ -58,4 +76,65 @@ export async function featureCommand(argv: string[], cwd: string) {
 
   const createdPath = FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
   Logger.info(`Created ${createdPath}`);
+}
+
+function handleFeatureList(projectRoot: string, flags: Record<string, string | boolean>) {
+  const features = FeatureService.listFeatures(projectRoot);
+
+  if (features.length === 0) {
+    Logger.info("No features found.");
+    return;
+  }
+
+  // Format as table
+  Logger.info("");
+  Logger.info("Features:");
+  Logger.info("─".repeat(80));
+  
+  for (const feature of features) {
+    const statusEmoji = {
+      active: "🟢",
+      draft: "🟡",
+      deprecated: "🔴",
+      completed: "✅"
+    }[feature.status] || "⚪";
+    
+    Logger.info(`${statusEmoji} ${feature.id.padStart(3, " ")} | ${feature.status.padEnd(10)} | ${feature.title}`);
+  }
+  
+  Logger.info("─".repeat(80));
+  Logger.info(`Total: ${features.length} feature(s)`);
+  Logger.info("");
+}
+
+async function handleFeatureStatus(
+  projectRoot: string,
+  args: string[],
+  flags: Record<string, string | boolean>
+) {
+  const featureId = args[0] || getStringFlag(flags, "id");
+  let newStatus = args[1] || getStringFlag(flags, "status");
+
+  if (!featureId) {
+    throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Missing feature ID. Usage: levit feature status <id> <status>");
+  }
+
+  const validStatuses: Array<'active' | 'draft' | 'deprecated' | 'completed'> = 
+    ['active', 'draft', 'deprecated', 'completed'];
+
+  if (!newStatus) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    newStatus = (await rl.question(`New status [active|draft|deprecated|completed]: `)).trim();
+    await rl.close();
+  }
+
+  if (!validStatuses.includes(newStatus as any)) {
+    throw new LevitError(
+      LevitErrorCode.VALIDATION_FAILED,
+      `Invalid status "${newStatus}". Must be one of: ${validStatuses.join(", ")}`
+    );
+  }
+
+  FeatureService.updateFeatureStatus(projectRoot, featureId, newStatus as any);
+  Logger.info(`Updated feature ${featureId} status to "${newStatus}"`);
 }

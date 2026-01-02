@@ -52,13 +52,14 @@ async function main() {
     switch (command) {
       case "init":
         const projectName = args[1];
+        const templateName = args[2] || undefined;
         if (!projectName) {
           throw new LevitError(
             LevitErrorCode.MISSING_REQUIRED_ARG,
-            "Project name is required. Usage: levit init <project-name>"
+            "Project name is required. Usage: levit init <project-name> [template]"
           );
         }
-        initProject(projectName, path.resolve(process.cwd(), projectName));
+        await initProject(projectName, path.resolve(process.cwd(), projectName), templateName);
         break;
 
       case "feature":

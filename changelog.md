@@ -7,6 +7,31 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
+## [0.7.0] – 2026-01-01
+
+### Added
+- **Auto-sync Manifest**: `levit.json` is now automatically synchronized after creating features, decisions, or handoffs
+- **Feature Management Commands**: 
+  - `levit feature list`: Lists all features with their status
+  - `levit feature status <id> <status>`: Updates a feature's status (active, draft, deprecated, completed)
+- **Dependency Validation**: 
+  - Validates that all `depends_on` references exist (features or decisions)
+  - Detects circular dependencies in feature dependencies
+- **Constraint Validation**: 
+  - Validates `max_file_size` constraint (reports files exceeding limit)
+  - Validates `forbidden_patterns` constraint (scans code for forbidden patterns)
+  - Validates `allowed_dependencies` constraint (checks package.json against allowed list)
+
+### Changed
+- **FeatureService**: Now includes `listFeatures()` and `updateFeatureStatus()` methods
+- **ValidationService**: Enhanced with dependency and constraint validation
+- **Manifest Sync**: Automatic sync after all create operations (feature, decision, handoff)
+
+### Technical Improvements
+- Improved error messages for dependency validation
+- Circular dependency detection using DFS algorithm
+- File size and pattern validation with efficient directory traversal
+
 ---
 
 ## [0.5.0] – 2026-01-01

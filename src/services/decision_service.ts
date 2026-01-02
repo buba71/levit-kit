@@ -1,6 +1,7 @@
 import path from "node:path";
 import { writeTextFile } from "../core/write_file";
 import { nextSequentialId } from "../core/ids";
+import { ManifestService } from "./manifest_service";
 
 export interface CreateDecisionOptions {
   title: string;
@@ -50,6 +51,9 @@ depends_on: [${featureRef || ""}]
      const content = `${frontmatter}# ADR ${id}: ${title}\n\n- **Date**: ${date}\n- **Status**: [Draft / Proposed / Approved]\n${featureLine}\n## Context\n[fill]\n\n## Decision\n[fill]\n\n## Rationale\n[fill]\n\n## Alternatives Considered\n[fill]\n\n## Consequences\n[fill]\n`;
 
      writeTextFile(decisionPath, content, { overwrite: !!overwrite });
+     
+     // Auto-sync manifest after decision creation
+     ManifestService.sync(projectRoot);
      
      return path.relative(projectRoot, decisionPath);
   }
