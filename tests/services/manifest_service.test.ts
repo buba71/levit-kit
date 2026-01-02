@@ -87,7 +87,7 @@ test("ManifestService.write creates manifest file", () => {
 
 test("ManifestService.sync discovers features from filesystem", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "manifest-test-"));
-  const featuresDir = path.join(tempDir, "features");
+  const featuresDir = path.join(tempDir, ".levit", "features");
   fs.ensureDirSync(featuresDir);
   
   // Create a test feature file
@@ -118,7 +118,7 @@ depends_on: []
 
 test("ManifestService.sync discovers roles from filesystem", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "manifest-test-"));
-  const rolesDir = path.join(tempDir, "roles");
+  const rolesDir = path.join(tempDir, ".levit", "roles");
   fs.ensureDirSync(rolesDir);
   
   // Create a test role file
@@ -133,14 +133,14 @@ This is the security role description.
   assert.strictEqual(manifest.roles.length, 1);
   assert.strictEqual(manifest.roles[0].name, "security");
   assert.strictEqual(manifest.roles[0].description, "Security Role");
-  assert.strictEqual(manifest.roles[0].path, "roles/security.md");
+  assert.strictEqual(manifest.roles[0].path, ".levit/roles/security.md");
   
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
 test("ManifestService.sync ignores README files", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "manifest-test-"));
-  const featuresDir = path.join(tempDir, "features");
+  const featuresDir = path.join(tempDir, ".levit", "features");
   fs.ensureDirSync(featuresDir);
   
   // Create README and INTENT files (should be ignored)
@@ -183,7 +183,7 @@ test("ManifestService.sync handles missing directories gracefully", () => {
 
 test("ManifestService.sync handles features with invalid frontmatter gracefully", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "manifest-test-"));
-  const featuresDir = path.join(tempDir, "features");
+  const featuresDir = path.join(tempDir, ".levit", "features");
   fs.ensureDirSync(featuresDir);
   
   // Create feature with invalid frontmatter (missing closing ---)
@@ -209,7 +209,7 @@ status: active
 
 test("ManifestService.sync extracts title from INTENT header", () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "manifest-test-"));
-  const featuresDir = path.join(tempDir, "features");
+  const featuresDir = path.join(tempDir, ".levit", "features");
   fs.ensureDirSync(featuresDir);
   
   const featureContent = `---

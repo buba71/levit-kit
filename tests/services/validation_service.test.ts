@@ -26,8 +26,8 @@ test("ValidationService reports errors if core directories are missing", () => {
 test("ValidationService passes for valid structure", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "validation-service-succ-"));
     
-    // Scout scaffolding: features, .levit/decisions, .levit/handoff, core files
-    const dirs = ["features", ".levit/decisions", ".levit/handoff"];
+    // Scout scaffolding: .levit/features, .levit/decisions, .levit/handoff, core files
+    const dirs = [".levit/features", ".levit/decisions", ".levit/handoff"];
     dirs.forEach(d => fs.ensureDirSync(path.join(tempDir, d)));
 
     const files = ["SOCIAL_CONTRACT.md", ".levit/AGENT_CONTRACT.md", ".levit/AGENT_ONBOARDING.md"];
@@ -42,7 +42,7 @@ test("ValidationService passes for valid structure", () => {
 
 test("ValidationService detects feature with invalid frontmatter", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "validation-service-test-"));
-    const featuresDir = path.join(tempDir, "features");
+    const featuresDir = path.join(tempDir, ".levit", "features");
     fs.ensureDirSync(featuresDir);
     
     // Create core structure
@@ -73,7 +73,7 @@ status: active
 
 test("ValidationService detects feature without INTENT header", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "validation-service-test-"));
-    const featuresDir = path.join(tempDir, "features");
+    const featuresDir = path.join(tempDir, ".levit", "features");
     fs.ensureDirSync(featuresDir);
     
     // Create core structure
@@ -112,8 +112,8 @@ test("ValidationService detects decision with invalid frontmatter", () => {
     fs.ensureDirSync(decisionsDir);
     
     // Create core structure
-    fs.ensureDirSync(path.join(tempDir, "features"));
-    fs.ensureDirSync(path.join(tempDir, ".levit/handoff"));
+    fs.ensureDirSync(path.join(tempDir, ".levit", "features"));
+    fs.ensureDirSync(path.join(tempDir, ".levit", "handoff"));
     fs.writeFileSync(path.join(tempDir, "SOCIAL_CONTRACT.md"), "content");
     fs.writeFileSync(path.join(tempDir, ".levit/AGENT_CONTRACT.md"), "content");
     fs.writeFileSync(path.join(tempDir, ".levit/AGENT_ONBOARDING.md"), "content");
@@ -147,8 +147,8 @@ test("ValidationService detects handoff with missing frontmatter", () => {
     fs.ensureDirSync(handoffDir);
     
     // Create core structure
-    fs.ensureDirSync(path.join(tempDir, "features"));
-    fs.ensureDirSync(path.join(tempDir, ".levit/decisions"));
+    fs.ensureDirSync(path.join(tempDir, ".levit", "features"));
+    fs.ensureDirSync(path.join(tempDir, ".levit", "decisions"));
     fs.writeFileSync(path.join(tempDir, "SOCIAL_CONTRACT.md"), "content");
     fs.writeFileSync(path.join(tempDir, ".levit/AGENT_CONTRACT.md"), "content");
     fs.writeFileSync(path.join(tempDir, ".levit/AGENT_ONBOARDING.md"), "content");
@@ -170,7 +170,7 @@ No frontmatter here
 
 test("ValidationService reports warning when no features exist", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "validation-service-test-"));
-    const featuresDir = path.join(tempDir, "features");
+    const featuresDir = path.join(tempDir, ".levit", "features");
     fs.ensureDirSync(featuresDir);
     
     // Create core structure
@@ -193,7 +193,7 @@ test("ValidationService reports warning when no features exist", () => {
 
 test("ValidationService counts files scanned correctly", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "validation-service-test-"));
-    const featuresDir = path.join(tempDir, "features");
+    const featuresDir = path.join(tempDir, ".levit", "features");
     fs.ensureDirSync(featuresDir);
     
     // Create core structure
