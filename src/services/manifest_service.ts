@@ -33,7 +33,7 @@ export class ManifestService {
   }
 
   private static scanFeatures(projectRoot: string): FeatureRef[] {
-    const featuresDir = path.join(projectRoot, "features");
+    const featuresDir = path.join(projectRoot, ".levit", "features");
     
     if (!fs.existsSync(featuresDir)) {
       return [];
@@ -50,7 +50,7 @@ export class ManifestService {
       const match = file.match(/^(\d+)-(.+)\.md$/);
       const id = match ? match[1] : "unknown";
       const slug = match ? match[2] : file.replace(".md", "");
-      
+
       // Extract title from content (# INTENT: Title)
       const titleMatch = content.match(/# INTENT:\s*(.+)/);
       const title = titleMatch ? titleMatch[1].trim() : slug;
@@ -60,13 +60,13 @@ export class ManifestService {
         slug,
         status: (frontmatter.status as any) || "active",
         title,
-        path: `features/${file}`
+        path: `.levit/features/${file}`
       };
     });
   }
 
   private static scanRoles(projectRoot: string): RoleRef[] {
-    const rolesDir = path.join(projectRoot, "roles");
+    const rolesDir = path.join(projectRoot, ".levit", "roles");
     
     if (!fs.existsSync(rolesDir)) {
       return [];
@@ -86,7 +86,7 @@ export class ManifestService {
       return {
         name,
         description,
-        path: `roles/${file}`
+        path: `.levit/roles/${file}`
       };
     });
   }

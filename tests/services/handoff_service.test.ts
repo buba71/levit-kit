@@ -14,7 +14,7 @@ test("HandoffService.createHandoff generates correct file name", () => {
     const date = new Date().toISOString().slice(0, 10);
     
     HandoffService.createHandoff(tempDir, {
-        feature: "features/login.md",
+        feature: ".levit/features/login.md",
         role: "qa"
     });
 

@@ -20,7 +20,7 @@ export class FeatureService {
     const { title, slug, overwrite } = options;
     let { id } = options;
 
-    const baseDir = path.join(projectRoot, "features");
+    const baseDir = path.join(projectRoot, ".levit", "features");
     
     // Auto-generate ID if missing
     if (!id) {

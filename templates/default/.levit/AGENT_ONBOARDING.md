@@ -11,7 +11,7 @@ This project is a hybrid workspace where humans define intentions and AI ensures
 ## 2. Navigation & Context
 To understand this project quickly, explore in this order:
 1.  `SOCIAL_CONTRACT.md`: Your ethical and operational boundaries.
-2.  `features/`: The roadmap and logic of what we are building.
+2.  `.levit/features/`: The roadmap and logic of what we are building.
 3.  `.levit/decisions/`: History of technical choices (ADRs).
 4.  `.levit/handoff/`: Specific context for your current mission.
 5.  `.levit/workflows/`: Step-by-step guides for common tasks.
@@ -19,7 +19,7 @@ To understand this project quickly, explore in this order:
 ## 3. Rules of Engagement
 - **Transparency**: If you are unsure about a decision, ask the human. Do not "hallucinate" architectural choices.
 - **Atomicity**: Keep your edits small and focused.
-- **Traceability**: Every major change should be linked to a feature defined in `features/`.
+- **Traceability**: Every major change should be linked to a feature defined in `.levit/features/`.
 - **Tests First**: Before submitting a complex change, check if tests exist in `tests/` and run them.
 
 ## 4. How to use Workflows

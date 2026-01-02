@@ -3,7 +3,7 @@ import assert from "node:assert";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { execSync } from "node:child_process";
+import { execSync, spawnSync } from "node:child_process";
 
 import { initProject } from "../../src/commands/init";
 
@@ -15,7 +15,7 @@ function getCliPath() {
   return path.join(process.cwd(), "dist", "bin", "cli.js");
 }
 
-test("levit init copies default template exactly", () => {
+test("levit init copies default template exactly", async () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
   );
@@ -23,20 +23,14 @@ test("levit init copies default template exactly", () => {
   const projectName = "test-project";
   const projectPath = path.join(tempDir, projectName);
 
-  initProject(projectName, projectPath);
+  await initProject(projectName, projectPath, "default");
 
   // Core structure assertions
   assert.ok(exists(projectPath), "Project directory should exist");
   assert.ok(exists(path.join(projectPath, "README.md")));
   assert.ok(exists(path.join(projectPath, "SOCIAL_CONTRACT.md")));
-  assert.ok(exists(path.join(projectPath, "features")));
-  assert.ok(exists(path.join(projectPath, "agents")));
-  assert.ok(exists(path.join(projectPath, "roles")));
-  assert.ok(exists(path.join(projectPath, "pipelines")));
-  assert.ok(exists(path.join(projectPath, "docs")));
-  assert.ok(exists(path.join(projectPath, "roles", "README.md")), "Roles README should exist");
 
-  // AIDD assertions
+  // AIDD assertions - all governance in .levit/
   assert.ok(exists(path.join(projectPath, ".levit")), ".levit directory should exist");
   assert.ok(exists(path.join(projectPath, ".levit", "AGENT_ONBOARDING.md")), "AGENT_ONBOARDING.md should exist");
   assert.ok(exists(path.join(projectPath, ".levit", "AGENT_CONTRACT.md")), "AGENT_CONTRACT.md should exist");
@@ -44,25 +38,32 @@ test("levit init copies default template exactly", () => {
   assert.ok(exists(path.join(projectPath, ".levit", "workflows", "submit-for-review.md")), "Submit for review workflow should exist");
   assert.ok(exists(path.join(projectPath, ".levit", "prompts")), "Prompts directory should exist");
   assert.ok(exists(path.join(projectPath, ".levit", "prompts", "global-rules.md")), "Global rules should exist");
-
-  // New folders assertions
-  assert.ok(exists(path.join(projectPath, "evals")), "Evals directory should exist");
-  assert.ok(exists(path.join(projectPath, "evals", "README.md")), "Evals README should exist");
+  
+  // All governance directories in .levit/
+  assert.ok(exists(path.join(projectPath, ".levit", "features")), "Features directory should exist in .levit/");
+  assert.ok(exists(path.join(projectPath, ".levit", "features", "README.md")), "Features README should exist");
+  assert.ok(exists(path.join(projectPath, ".levit", "roles")), "Roles directory should exist in .levit/");
+  assert.ok(exists(path.join(projectPath, ".levit", "roles", "README.md")), "Roles README should exist");
+  assert.ok(exists(path.join(projectPath, ".levit", "agents")), "Agents directory should exist in .levit/");
+  assert.ok(exists(path.join(projectPath, ".levit", "pipelines")), "Pipelines directory should exist in .levit/");
+  assert.ok(exists(path.join(projectPath, ".levit", "docs")), "Docs directory should exist in .levit/");
+  assert.ok(exists(path.join(projectPath, ".levit", "evals")), "Evals directory should exist in .levit/");
+  assert.ok(exists(path.join(projectPath, ".levit", "evals", "README.md")), "Evals README should exist");
   assert.ok(exists(path.join(projectPath, ".gitignore")), ".gitignore should exist");
 
   // Agent boundaries
   assert.ok(
-    exists(path.join(projectPath, "agents", "AGENTS.md")),
+    exists(path.join(projectPath, ".levit", "agents", "AGENTS.md")),
     "Agent guidelines should exist"
   );
 
   // Feature contract
   assert.ok(
-    exists(path.join(projectPath, "features", "README.md")),
+    exists(path.join(projectPath, ".levit", "features", "README.md")),
     "Feature README should exist"
   );
   assert.ok(
-    exists(path.join(projectPath, "features", "INTENT.md")),
+    exists(path.join(projectPath, ".levit", "features", "INTENT.md")),
     "Feature INTENT template should exist"
   );
 
@@ -71,68 +72,80 @@ test("levit init copies default template exactly", () => {
 });
 
 test("CLI --help works", () => {
-  const output = execSync("node dist/bin/cli.js --help").toString();
+  const output = execSync("node dist/bin/cli.js --help", { encoding: "utf-8" });
   assert.ok(output.includes("Usage: levit [command] [options]"));
   assert.ok(output.includes("init <project-name>"));
 });
 
-test("CLI feature new creates a feature intent file", () => {
+test("CLI feature new creates a feature intent file", async () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
   );
 
   const projectName = "test-project";
   const projectPath = path.join(tempDir, projectName);
-  initProject(projectName, projectPath);
+  await initProject(projectName, projectPath, "default");
 
   const cliPath = getCliPath();
 
-  execSync(
-    `node ${cliPath} feature new --yes --id 001 --title "My Feature" --slug my-feature`,
-    { cwd: projectPath }
-  );
+  const result = spawnSync("node", [cliPath, "feature", "new", "--yes", "--id", "001", "--title", "My Feature", "--slug", "my-feature"], {
+    cwd: projectPath,
+    encoding: "utf-8"
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
 
-  assert.ok(exists(path.join(projectPath, "features", "001-my-feature.md")));
+  assert.ok(exists(path.join(projectPath, ".levit", "features", "001-my-feature.md")));
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("CLI feature new auto-assigns id when omitted", () => {
+test("CLI feature new auto-assigns id when omitted", async () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
   );
 
   const projectName = "test-project";
   const projectPath = path.join(tempDir, projectName);
-  initProject(projectName, projectPath);
+  await initProject(projectName, projectPath, "default");
 
   const cliPath = getCliPath();
 
-  execSync(
-    `node ${cliPath} feature new --yes --title "My Feature" --slug my-feature`,
-    { cwd: projectPath }
-  );
+  const result = spawnSync("node", [cliPath, "feature", "new", "--yes", "--title", "My Feature", "--slug", "my-feature"], {
+    cwd: projectPath,
+    encoding: "utf-8"
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
 
-  assert.ok(exists(path.join(projectPath, "features", "001-my-feature.md")));
+  assert.ok(exists(path.join(projectPath, ".levit", "features", "001-my-feature.md")));
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("CLI decision new creates a decision record", () => {
+test("CLI decision new creates a decision record", async () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
   );
 
   const projectName = "test-project";
   const projectPath = path.join(tempDir, projectName);
-  initProject(projectName, projectPath);
+  await initProject(projectName, projectPath, "default");
+  
+  // Create a feature first
+  fs.writeFileSync(
+    path.join(projectPath, ".levit", "features", "001-some-feature.md"),
+    "---\nid: 001\nstatus: active\n---\n\n# INTENT: Some Feature\n"
+  );
 
   const cliPath = getCliPath();
 
-  execSync(
-    `node ${cliPath} decision new --yes --id 001 --title "Choose DB" --feature features/001-some-feature.md`,
-    { cwd: projectPath }
-  );
+  const result = spawnSync("node", [cliPath, "decision", "new", "--yes", "--id", "001", "--title", "Choose DB", "--feature", ".levit/features/001-some-feature.md"], {
+    cwd: projectPath,
+    encoding: "utf-8"
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
 
   assert.ok(exists(path.join(projectPath, ".levit", "decisions")));
   assert.ok(exists(path.join(projectPath, ".levit", "decisions", "ADR-001-choose-db.md")));
@@ -140,42 +153,52 @@ test("CLI decision new creates a decision record", () => {
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("CLI decision new auto-assigns id when omitted", () => {
+test("CLI decision new auto-assigns id when omitted", async () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
   );
 
   const projectName = "test-project";
   const projectPath = path.join(tempDir, projectName);
-  initProject(projectName, projectPath);
+  await initProject(projectName, projectPath, "default");
 
   const cliPath = getCliPath();
 
-  execSync(
-    `node ${cliPath} decision new --yes --title "Auto ID Decision"`,
-    { cwd: projectPath }
-  );
+  const result = spawnSync("node", [cliPath, "decision", "new", "--yes", "--title", "Auto ID Decision"], {
+    cwd: projectPath,
+    encoding: "utf-8"
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
 
   assert.ok(exists(path.join(projectPath, ".levit", "decisions", "ADR-001-auto-id-decision.md")));
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("CLI handoff new creates an agent handoff brief", () => {
+test("CLI handoff new creates an agent handoff brief", async () => {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "levit-kit-test-")
   );
 
   const projectName = "test-project";
   const projectPath = path.join(tempDir, projectName);
-  initProject(projectName, projectPath);
+  await initProject(projectName, projectPath, "default");
+  
+  // Create a feature first
+  fs.writeFileSync(
+    path.join(projectPath, ".levit", "features", "001-some-feature.md"),
+    "---\nid: 001\nstatus: active\n---\n\n# INTENT: Some Feature\n"
+  );
 
   const cliPath = getCliPath();
 
-  execSync(
-    `node ${cliPath} handoff new --yes --feature features/001-some-feature.md --role security`,
-    { cwd: projectPath }
-  );
+  const result = spawnSync("node", [cliPath, "handoff", "new", "--yes", "--feature", ".levit/features/001-some-feature.md", "--role", "security"], {
+    cwd: projectPath,
+    encoding: "utf-8"
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
 
   const handoffDir = path.join(projectPath, ".levit", "handoff");
   assert.ok(exists(handoffDir));
@@ -185,7 +208,7 @@ test("CLI handoff new creates an agent handoff brief", () => {
 });
 
 test("CLI --version works", () => {
-  const output = execSync("node dist/bin/cli.js --version").toString();
+  const output = execSync("node dist/bin/cli.js --version", { encoding: "utf-8" });
   assert.ok(output.startsWith("levit-kit v"));
 });
 

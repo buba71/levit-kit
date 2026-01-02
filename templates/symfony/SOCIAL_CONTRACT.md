@@ -31,3 +31,4 @@ When working with Symfony:
 
 This contract exists to preserve clarity over time.
 
+

@@ -12,12 +12,12 @@ This project is a **Symfony application** in a hybrid workspace where humans def
 ## 2. Navigation & Context
 To understand this project quickly, explore in this order:
 1.  `SOCIAL_CONTRACT.md`: Your ethical and operational boundaries.
-2.  `features/`: The roadmap and logic of what we are building.
+2.  `.levit/features/`: The roadmap and logic of what we are building.
 3.  `.levit/decisions/`: History of technical choices (ADRs).
 4.  `.levit/handoff/`: Specific context for your current mission.
 5.  `.levit/workflows/`: Step-by-step guides for common tasks.
-6.  `composer.json`: Project dependencies and configuration.
-7.  `config/`: Symfony configuration files.
+6.  `composer.json`: Project dependencies and configuration (created separately).
+7.  `config/`: Symfony configuration files (created separately).
 
 ## 3. Symfony-Specific Rules
 

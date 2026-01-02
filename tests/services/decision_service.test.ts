@@ -14,7 +14,7 @@ test("DecisionService.createDecision generates correct structure", () => {
     DecisionService.createDecision(tempDir, {
         title: "Test Architecture",
         id: "005",
-        featureRef: "features/001.md"
+        featureRef: ".levit/features/001.md"
     });
 
     const expectedFile = path.join(decisionsDir, "ADR-005-test-architecture.md");
@@ -22,7 +22,7 @@ test("DecisionService.createDecision generates correct structure", () => {
 
     const content = fs.readFileSync(expectedFile, "utf-8");
     assert.ok(content.includes("id: ADR-005"));
-    assert.ok(content.includes("depends_on: [features/001.md]"));
+    assert.ok(content.includes("depends_on: [.levit/features/001.md]"));
 
     fs.rmSync(tempDir, { recursive: true, force: true });
 });

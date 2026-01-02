@@ -57,7 +57,7 @@ export const DEFAULT_MANIFEST: LevitManifest = {
     forbidden_patterns: []
   },
   paths: {
-    features: "features",
+    features: ".levit/features",
     decisions: ".levit/decisions",
     handoffs: ".levit/handoff",
   },

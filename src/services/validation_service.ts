@@ -45,7 +45,7 @@ export class ValidationService {
       }
 
       // 2. Check directories
-      const coreDirs = ["features", ".levit/decisions", ".levit/handoff"];
+      const coreDirs = [".levit/features", ".levit/decisions", ".levit/handoff"];
       for (const dir of coreDirs) {
         if (!fs.existsSync(path.join(projectRoot, dir))) {
           issues.push({
@@ -58,16 +58,16 @@ export class ValidationService {
       }
 
       // 3. Check Features
-      const featuresPath = path.join(projectRoot, "features");
+      const featuresPath = path.join(projectRoot, ".levit", "features");
       if (fs.existsSync(featuresPath)) {
         const files = fs.readdirSync(featuresPath).filter((f) => f.endsWith(".md") && f !== "README.md");
         filesScanned += files.length;
         if (files.length === 0) {
-          issues.push({
+            issues.push({
             type: "warning",
             code: "NO_FEATURES",
-            message: "No features found in features/",
-            file: "features/"
+            message: "No features found in .levit/features/",
+            file: ".levit/features/"
           });
         } else {
           for (const file of files) {
@@ -86,7 +86,7 @@ export class ValidationService {
                 type: "error",
                 code: "INVALID_STRUCTURE",
                 message: `Feature ${file} is missing an # INTENT header.`,
-                file: path.join("features", file)
+                file: path.join(".levit", "features", file)
               });
             }
           }
@@ -225,7 +225,7 @@ export class ValidationService {
         type: "error",
         code: "CIRCULAR_DEPENDENCY",
         message: `Circular dependency detected: ${cycle.join(" → ")} → ${cycle[0]}`,
-        file: "features/",
+        file: ".levit/features/",
         details: { cycle }
       });
     }

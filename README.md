@@ -99,7 +99,7 @@ The `init` command:
 4. Includes a base `.gitignore`.
 5. Exits immediately.
 
-> **Note**: Templates provide only the **AIDD governance structure** (`.levit/`, `features/`, etc.), 
+> **Note**: Templates provide only the **AIDD governance structure** (`.levit/` directory with all governance), 
 > not project-specific configuration files. You should create your project files (package.json, composer.json, etc.) 
 > separately according to your needs.
 
@@ -123,7 +123,7 @@ Levit-kit installs a cognitive pipeline in your project:
 2.  **Agent Onboarding**: Your AI reads `.levit/AGENT_ONBOARDING.md` to learn your rules.
 3.  **Collaborative Decision**: The agent or human proposes technical choices using `levit decision new` (stored in `.levit/decisions/`).
 4.  **Handoff**: You package the task for an agent using `levit handoff new`.
-5.  **Verification**: You or the agent run quality tests in `evals/`.
+5.  **Verification**: You or the agent run quality tests in `.levit/evals/`.
 6.  **Review**: The agent submits its work following the protocol in `.levit/workflows/`.
 
 ---
@@ -137,11 +137,11 @@ Levit-kit installs a cognitive pipeline in your project:
 $ levit feature new
 Feature title: User Authentication
 Feature slug [user-authentication]: 
-Created features/001-user-authentication.md
+Created .levit/features/001-user-authentication.md
 
 # Non-interactive mode (with flags)
 $ levit feature new --title "User Authentication" --slug user-authentication --yes
-Created features/001-user-authentication.md
+Created .levit/features/001-user-authentication.md
 ```
 
 The created feature file includes:
@@ -152,7 +152,7 @@ The created feature file includes:
 
 ```bash
 # Link a decision to a feature
-$ levit decision new --title "Use PostgreSQL for user data" --feature features/001-user-authentication.md --yes
+$ levit decision new --title "Use PostgreSQL for user data" --feature .levit/features/001-user-authentication.md --yes
 Created .levit/decisions/ADR-001-use-postgresql-for-user-data.md
 
 # Auto-assign ID
@@ -164,11 +164,11 @@ Created .levit/decisions/ADR-002-implement-jwt-authentication.md
 
 ```bash
 # Handoff a feature to a developer agent
-$ levit handoff new --feature features/001-user-authentication.md --role developer --yes
+$ levit handoff new --feature .levit/features/001-user-authentication.md --role developer --yes
 Created .levit/handoff/2026-01-01-001-user-authentication-developer.md
 
 # Handoff to security reviewer
-$ levit handoff new --feature features/001-user-authentication.md --role security --yes
+$ levit handoff new --feature .levit/features/001-user-authentication.md --role security --yes
 Created .levit/handoff/2026-01-01-001-user-authentication-security.md
 ```
 
@@ -197,14 +197,14 @@ $ cd my-api-project
 
 # 2. Create a feature
 $ levit feature new --title "API Rate Limiting" --slug api-rate-limiting --yes
-Created features/001-api-rate-limiting.md
+Created .levit/features/001-api-rate-limiting.md
 
 # 3. Create a technical decision
-$ levit decision new --title "Use Redis for rate limiting" --feature features/001-api-rate-limiting.md --yes
+$ levit decision new --title "Use Redis for rate limiting" --feature .levit/features/001-api-rate-limiting.md --yes
 Created .levit/decisions/ADR-001-use-redis-for-rate-limiting.md
 
 # 4. Handoff to developer
-$ levit handoff new --feature features/001-api-rate-limiting.md --role developer --yes
+$ levit handoff new --feature .levit/features/001-api-rate-limiting.md --role developer --yes
 Created .levit/handoff/2026-01-01-001-api-rate-limiting-developer.md
 
 # 5. Agent reads handoff and implements
@@ -237,7 +237,7 @@ The `levit.json` manifest is automatically synced when you create features or de
       "slug": "api-rate-limiting",
       "status": "active",
       "title": "API Rate Limiting",
-      "path": "features/001-api-rate-limiting.md"
+      "path": ".levit/features/001-api-rate-limiting.md"
     }
   ],
   "roles": [

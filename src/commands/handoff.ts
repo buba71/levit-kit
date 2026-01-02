@@ -13,7 +13,7 @@ export async function handoffCommand(argv: string[], cwd: string) {
   if (sub !== "new") {
     throw new LevitError(
       LevitErrorCode.INVALID_COMMAND,
-      "Usage: levit handoff new --feature <features/001-...md> [--role developer|qa|security|devops]"
+      "Usage: levit handoff new --feature <.levit/features/001-...md> [--role developer|qa|security|devops]"
     );
   }
 
@@ -29,7 +29,7 @@ export async function handoffCommand(argv: string[], cwd: string) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
     if (!feature) {
-      feature = (await rl.question("Feature path (e.g. features/001-...md): ")).trim();
+      feature = (await rl.question("Feature path (e.g. .levit/features/001-...md): ")).trim();
     }
 
     if (!role) {

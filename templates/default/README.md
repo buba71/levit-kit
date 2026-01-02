@@ -12,12 +12,12 @@ It is designed for a **hybrid workspace** where Human vision leads and AI execut
 ### 2. The "Intent-First" Workflow
 When building a new feature, do not start with code:
 1.  **Declare Intent**: Run `levit feature new` and follow the prompts.
-2.  **Define Boundaries**: Open the generated file in `features/` and refine the "User Story" and "Boundaries" section.
+2.  **Define Boundaries**: Open the generated file in `.levit/features/` and refine the "User Story" and "Boundaries" section.
 
 ### 3. Leading your Agents
 When using an AI agent (Antigravity, Cursor, etc.):
 1.  **Onboard the Agent**: Direct it to read `.levit/AGENT_ONBOARDING.md` in your first prompt.
-2.  **Assign the Task**: Point it to your new intent file in `features/`.
+2.  **Assign the Task**: Point it to your new intent file in `.levit/features/`.
 3.  **Review the Output**: Follow the guides in `.levit/workflows/submit-for-review.md`.
 
 ---
@@ -30,6 +30,9 @@ This repository is built for **clarity over automation**:
 
 ## 📂 Navigation
 - `SOCIAL_CONTRACT.md`: Your ethical and operational foundations.
-- `.levit/`: The AI's workspace (Onboarding, Prompts, Workflows).
-- `features/`: The project roadmap and active intents.
-- `evals/`: Technical quality tests for AI outputs.
+- `.levit/`: The AI's workspace (Onboarding, Prompts, Workflows, Features, Roles, etc.).
+  - `.levit/features/`: The project roadmap and active intents.
+  - `.levit/evals/`: Technical quality tests for AI outputs.
+  - `.levit/roles/`: Defined roles for the project.
+  - `.levit/decisions/`: Architecture Decision Records (ADRs).
+  - `.levit/handoff/`: Agent handoff briefs.

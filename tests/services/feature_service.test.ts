@@ -8,7 +8,7 @@ import { FeatureService } from "../../src/services/feature_service";
 
 test("FeatureService.createFeature generates correct file", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "feature-service-test-"));
-    const featuresDir = path.join(tempDir, "features");
+    const featuresDir = path.join(tempDir, ".levit", "features");
     fs.ensureDirSync(featuresDir);
 
     FeatureService.createFeature(tempDir, {
@@ -31,7 +31,7 @@ test("FeatureService.createFeature generates correct file", () => {
 
 test("FeatureService.createFeature auto-generates ID", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "feature-service-test-"));
-    const featuresDir = path.join(tempDir, "features");
+    const featuresDir = path.join(tempDir, ".levit", "features");
     fs.ensureDirSync(featuresDir);
 
     FeatureService.createFeature(tempDir, {
