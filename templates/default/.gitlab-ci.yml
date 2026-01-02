@@ -28,10 +28,21 @@ levit-validate:
             for (const line of lines) {
               try {
                 const obj = JSON.parse(line);
-                if (obj.level === 'ERROR' || (obj.message && obj.message.includes('error'))) {
+                // Check for ERROR level or validation failure messages
+                if (obj.level === 'ERROR' || 
+                    (obj.message && (
+                      obj.message.toLowerCase().includes('error') ||
+                      obj.message.toLowerCase().includes('validation failed') ||
+                      obj.message.toLowerCase().includes('failed')
+                    ))) {
                   errorCount++;
                 }
-              } catch (e) {}
+              } catch (e) {
+                // Non-JSON lines might be error messages
+                if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) {
+                  errorCount++;
+                }
+              }
             }
             console.log(errorCount);
           } catch (e) {
