@@ -1,0 +1,62 @@
+# GitLab CI configuration for levit-kit validation
+# Add this to your existing .gitlab-ci.yml or use it as a separate file
+
+stages:
+  - validate
+
+levit-validate:
+  stage: validate
+  image: node:20
+  before_script:
+    - npm install -g @buba_71/levit
+  script:
+    - |
+      echo "🔍 Validating levit-kit project structure..."
+      levit validate --json > validation.json 2>&1 || VALIDATION_EXIT=$?
+      
+      if [ -f validation.json ]; then
+        echo "Validation results:"
+        cat validation.json
+        
+        # Count errors in JSON output
+        ERRORS=$(node -e "
+          try {
+            const fs = require('fs');
+            const content = fs.readFileSync('validation.json', 'utf8');
+            const lines = content.split('\\n').filter(l => l.trim());
+            let errorCount = 0;
+            for (const line of lines) {
+              try {
+                const obj = JSON.parse(line);
+                if (obj.level === 'ERROR' || (obj.message && obj.message.includes('error'))) {
+                  errorCount++;
+                }
+              } catch (e) {}
+            }
+            console.log(errorCount);
+          } catch (e) {
+            console.log('0');
+          }
+        " || echo "0")
+        
+        if [ "$ERRORS" -gt 0 ] || [ -n "$VALIDATION_EXIT" ]; then
+          echo "❌ Validation failed with errors"
+          exit 1
+        else
+          echo "✅ Validation passed"
+        fi
+      else
+        echo "⚠️ No validation output found"
+        exit 1
+      fi
+  artifacts:
+    when: always
+    paths:
+      - validation.json
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+    - master
+    - develop
+

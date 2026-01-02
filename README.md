@@ -127,6 +127,10 @@ Levit-kit installs a cognitive pipeline in your project:
 6.  **Review**: The agent submits its work following the protocol in `.levit/workflows/`.
 
 > **📖 New to managing AI agents?** After initializing a project, read `HUMAN_AGENT_MANAGER.md` for a comprehensive guide on effectively managing AI agents, including best practices, anti-patterns, and troubleshooting.
+>
+> **🔄 Migrating an existing project?** See `MIGRATION_GUIDE.md` for step-by-step instructions on adopting levit-kit in your existing codebase.
+>
+> **🚀 Setting up CI/CD?** Templates for GitHub Actions and GitLab CI are included in all projects for automatic validation.
 
 ---
 

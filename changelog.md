@@ -7,6 +7,29 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
+## [0.8.2] – 2026-01-02
+
+### Added
+- **Migration Guide**: Comprehensive guide for migrating existing projects to levit-kit
+  - Step-by-step migration process
+  - Multiple migration strategies (gradual, fresh start, full migration)
+  - Examples for migrating features and decisions
+  - Team adoption guidance
+  - Troubleshooting section
+  - Included in all project templates
+- **CI/CD Templates**: Ready-to-use CI/CD configurations
+  - **GitHub Actions**: `.github/workflows/levit-validate.yml` for automatic validation
+  - **GitLab CI**: `.gitlab-ci.yml` configuration for validation
+  - Both templates validate project structure on push and pull requests
+  - JSON output parsing and error detection
+  - Artifact uploads for validation results
+
+### Changed
+- **Project Templates**: Updated README files to reference Migration Guide and CI/CD templates
+- **Documentation**: Enhanced navigation sections with links to new guides
+
+---
+
 ## [0.8.1] – 2026-01-02
 
 ### Added

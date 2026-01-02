@@ -1,0 +1,82 @@
+name: Validate Levit Project
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  validate:
+    name: Validate levit-kit Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Validate levit-kit structure
+        id: validate
+        run: |
+          npx @buba_71/levit validate --json > validation.json 2>&1 || VALIDATION_EXIT=$?
+          if [ -n "$VALIDATION_EXIT" ]; then
+            echo "validation_failed=true" >> $GITHUB_OUTPUT
+          else
+            echo "validation_failed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Display validation results
+        if: always()
+        run: |
+          if [ -f validation.json ]; then
+            echo "## Validation Results" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat validation.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            
+            # Check for errors in JSON output
+            ERRORS=$(node -e "
+              try {
+                const fs = require('fs');
+                const content = fs.readFileSync('validation.json', 'utf8');
+                const lines = content.split('\\n').filter(l => l.trim());
+                let errorCount = 0;
+                for (const line of lines) {
+                  try {
+                    const obj = JSON.parse(line);
+                    if (obj.level === 'ERROR' || (obj.message && obj.message.includes('error'))) {
+                      errorCount++;
+                    }
+                  } catch (e) {}
+                }
+                console.log(errorCount);
+              } catch (e) {
+                console.log('0');
+              }
+            " || echo "0")
+            
+            if [ "$ERRORS" -gt 0 ] || [ "${{ steps.validate.outputs.validation_failed }}" == "true" ]; then
+              echo "❌ Validation failed"
+              exit 1
+            else
+              echo "✅ Validation passed"
+            fi
+          else
+            echo "⚠️ No validation output found"
+            exit 1
+          fi
+      
+      - name: Upload validation results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-results
+          path: validation.json
+          if-no-files-found: ignore
+
