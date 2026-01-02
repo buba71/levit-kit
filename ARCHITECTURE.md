@@ -34,6 +34,7 @@ src/
 └── core/                   # Shared utilities
     ├── logger.ts
     ├── errors.ts
+    ├── security.ts         # Security utilities (path validation, safe file ops)
     ├── cli_args.ts
     ├── ids.ts
     ├── paths.ts
@@ -48,6 +49,80 @@ tests/
     ├── handoff_service.test.ts
     └── validation_service.test.ts
 ```
+
+### Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "CLI Layer"
+        CLI[bin/cli.ts<br/>Entry Point]
+    end
+    
+    subgraph "Commands Layer"
+        CMD1[init.ts]
+        CMD2[feature.ts]
+        CMD3[decision.ts]
+        CMD4[handoff.ts]
+        CMD5[validate.ts]
+    end
+    
+    subgraph "Services Layer"
+        SVC1[FeatureService]
+        SVC2[DecisionService]
+        SVC3[HandoffService]
+        SVC4[ValidationService]
+        SVC5[ManifestService]
+        SVC6[ProjectService]
+    end
+    
+    subgraph "Core Layer"
+        CORE1[logger.ts]
+        CORE2[errors.ts]
+        CORE3[security.ts]
+        CORE4[frontmatter.ts]
+        CORE5[ids.ts]
+    end
+    
+    CLI --> CMD1
+    CLI --> CMD2
+    CLI --> CMD3
+    CLI --> CMD4
+    CLI --> CMD5
+    
+    CMD1 --> SVC6
+    CMD2 --> SVC1
+    CMD3 --> SVC2
+    CMD4 --> SVC3
+    CMD5 --> SVC4
+    
+    SVC1 --> SVC5
+    SVC2 --> SVC5
+    SVC3 --> SVC5
+    
+    SVC1 --> CORE1
+    SVC1 --> CORE2
+    SVC1 --> CORE3
+    SVC1 --> CORE4
+    SVC1 --> CORE5
+    SVC2 --> CORE1
+    SVC3 --> CORE1
+    SVC4 --> CORE1
+    
+    style CLI fill:#e1f5ff
+    style CMD1 fill:#fff4e1
+    style CMD2 fill:#fff4e1
+    style CMD3 fill:#fff4e1
+    style CMD4 fill:#fff4e1
+    style CMD5 fill:#fff4e1
+    style SVC1 fill:#e8f5e9
+    style SVC2 fill:#e8f5e9
+    style SVC3 fill:#e8f5e9
+    style SVC4 fill:#e8f5e9
+    style SVC5 fill:#e8f5e9
+    style SVC6 fill:#e8f5e9
+```
+
+> **📐 For more detailed diagrams**, see [DIAGRAMS.md](../DIAGRAMS.md)
 
 ## Layers
 

@@ -126,11 +126,39 @@ Levit-kit installs a cognitive pipeline in your project:
 5.  **Verification**: You or the agent run quality tests in `.levit/evals/`.
 6.  **Review**: The agent submits its work following the protocol in `.levit/workflows/`.
 
+### Visual Workflow
+
+```mermaid
+sequenceDiagram
+    participant Human as Human
+    participant CLI as levit CLI
+    participant Agent as AI Agent
+    participant Manifest as levit.json
+
+    Human->>CLI: levit feature new
+    CLI->>Manifest: Register feature
+    
+    Human->>Agent: Read .levit/AGENT_ONBOARDING.md
+    Agent->>Manifest: Understand context
+    
+    Human->>CLI: levit decision new
+    CLI->>Manifest: Record decision
+    
+    Human->>CLI: levit handoff new
+    Human->>Agent: Execute handoff
+    Agent->>Manifest: Read feature & constraints
+    
+    Human->>CLI: levit validate
+    CLI-->>Human: Validation results
+```
+
 > **📖 New to managing AI agents?** After initializing a project, read `HUMAN_AGENT_MANAGER.md` for a comprehensive guide on effectively managing AI agents, including best practices, anti-patterns, and troubleshooting.
 >
 > **🔄 Migrating an existing project?** See `MIGRATION_GUIDE.md` for step-by-step instructions on adopting levit-kit in your existing codebase.
 >
 > **🚀 Setting up CI/CD?** Templates for GitHub Actions and GitLab CI are included in all projects for automatic validation.
+>
+> **📐 Want to see more diagrams?** Check out [DIAGRAMS.md](./DIAGRAMS.md) for comprehensive visual documentation of architecture, workflows, and data flows.
 
 ---
 
@@ -327,3 +355,21 @@ Contributions adding complexity, implicit automation, or decision-making logic w
 
 > Levit-kit does not make agents smarter.  
 > It makes projects more intelligible.
+
+---
+
+## Visual Documentation
+
+For a comprehensive visual understanding of levit-kit, check out:
+
+📐 **[DIAGRAMS.md](./DIAGRAMS.md)** - Complete visual documentation including:
+- Architecture diagrams (layers, data flow)
+- Workflow diagrams (AIDD cycle, feature lifecycle)
+- Project structure visualization
+- Security and validation flows
+- Command flow examples
+- Ecosystem positioning
+
+All diagrams use **Mermaid** syntax and are rendered natively on GitHub, GitLab, and most Markdown viewers.
+
+> **💡 Tip for VS Code users** : This project includes recommended extensions in `.vscode/extensions.json`. VS Code will prompt you to install them automatically, enabling Mermaid diagram rendering in Markdown preview.
