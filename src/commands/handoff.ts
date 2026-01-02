@@ -1,10 +1,17 @@
 import readline from "node:readline/promises";
+import chalk from "chalk";
+import path from "node:path";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
 import { Logger } from "../core/logger";
 import { HandoffService } from "../services/handoff_service";
 import { LevitError, LevitErrorCode } from "../core/errors";
+import { createBox } from "../core/table";
+
+function isoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export async function handoffCommand(argv: string[], cwd: string) {
   const { positional, flags } = parseArgs(argv);
@@ -21,6 +28,7 @@ export async function handoffCommand(argv: string[], cwd: string) {
 
   const yes = getBooleanFlag(flags, "yes");
   const overwrite = getBooleanFlag(flags, "force");
+  const isJsonMode = Logger.getJsonMode();
 
   let feature = getStringFlag(flags, "feature");
   let role = getStringFlag(flags, "role");
@@ -46,6 +54,34 @@ export async function handoffCommand(argv: string[], cwd: string) {
     role = "developer";
   }
 
+  // Preview before creation
+  if (!yes && !isJsonMode) {
+    const safeRole = role.trim().toLowerCase();
+    const date = isoDate();
+    const fileName = `${date}-${path.basename(feature, path.extname(feature))}-${safeRole}.md`;
+    const handoffPath = path.relative(projectRoot, path.join(projectRoot, ".levit", "handoff", fileName));
+    
+    const preview = createBox("Handoff Preview", {
+      "Date": date,
+      "Feature": feature,
+      "Role": safeRole,
+      "Path": handoffPath
+    });
+    
+    Logger.info("");
+    Logger.info(preview);
+    Logger.info("");
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const confirm = await rl.question("Create this handoff? [y/N]: ");
+    await rl.close();
+
+    if (confirm.toLowerCase() !== "y" && confirm.toLowerCase() !== "yes") {
+      Logger.info("Cancelled.");
+      return;
+    }
+  }
+
   const createdPath = HandoffService.createHandoff(projectRoot, { feature, role, overwrite });
-  Logger.info(`Created ${createdPath}`);
+  Logger.success(`Created ${createdPath}`);
 }

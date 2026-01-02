@@ -9,6 +9,19 @@ It provides a **hybrid workspace** where Human vision leads and AI execution fol
 
 ## 🚀 Quick Start: Human Operator Guide
 
+### 📖 Start Here: Read the Human-Agent Manager Guide
+
+**New to managing AI agents?** Start with the comprehensive guide:
+- **[HUMAN_AGENT_MANAGER.md](./HUMAN_AGENT_MANAGER.md)**: Complete guide on managing AI agents effectively
+
+This guide covers:
+- Understanding the Human-AI partnership
+- Creating effective features and decisions
+- Making handoffs that work
+- Reviewing agent work
+- Best practices and anti-patterns
+- Troubleshooting common issues
+
 ### 1. The Day One Setup
 
 **Step 1: Create your Symfony project**
@@ -61,6 +74,7 @@ This repository is built for **clarity over automation**:
 ## 📂 Navigation
 
 **Levit-Kit Structure (AIDD Governance):**
+- `HUMAN_AGENT_MANAGER.md`: **Complete guide for managing AI agents** (start here!)
 - `SOCIAL_CONTRACT.md`: Your ethical and operational foundations.
 - `.levit/`: The AI's workspace (all AIDD governance in one place).
   - `.levit/features/`: The project roadmap and active intents.

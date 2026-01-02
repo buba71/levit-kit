@@ -7,6 +7,63 @@ Versions `0.x` indicate that the public API and configuration format may still e
 
 ---
 
+## [0.8.1] – 2026-01-02
+
+### Added
+- **Human-Agent Manager Guide**: Comprehensive guide for developers on managing AI agents effectively
+  - Complete documentation on the Human-AI partnership model
+  - Best practices for creating features, decisions, and handoffs
+  - Anti-patterns to avoid and troubleshooting guide
+  - Included in all project templates (default and symfony)
+  - Referenced prominently in project README files
+
+### Changed
+- **Project Templates**: Updated README files to prominently feature the Human-Agent Manager Guide
+- **Main README**: Added reference to the guide in the AIDD Workflow section
+
+---
+
+## [0.8.0] – 2026-01-02
+
+### Added
+- **Enhanced UX with Colors and Formatting**:
+  - Colorized output using `chalk` for all log levels (info, warn, error, success)
+  - Formatted tables using `cli-table3` for `levit feature list` and `levit validate`
+  - Color-coded status indicators in feature lists (green=active, yellow=draft, red=deprecated, cyan=completed)
+- **Preview Before Creation**:
+  - Preview boxes showing feature/decision/handoff details before creation
+  - Interactive confirmation prompts (can be skipped with `--yes` flag)
+  - Clear visual feedback for all create operations
+- **Improved Error Messages**:
+  - Contextual suggestions for each error type
+  - Formatted error display with color coding
+  - Structured error output in JSON mode
+  - New `error_helper.ts` module for consistent error handling
+
+### Changed
+- **Logger Enhancement**:
+  - Added `success()` method for success messages (green)
+  - Added `getJsonMode()` method for checking JSON mode
+  - All log levels now use appropriate colors (blue=info, yellow=warn, red=error, green=success)
+- **Command Output**:
+  - `levit feature list`: Now displays formatted table with color-coded statuses
+  - `levit validate`: Now displays separate tables for errors and warnings with color coding
+  - All create commands (`feature new`, `decision new`, `handoff new`) show preview before creation
+- **Error Handling**:
+  - All errors now display with helpful suggestions
+  - Better error formatting with visual hierarchy
+  - Improved error messages in CLI entry point
+
+### Technical Improvements
+- Added `chalk` v4.1.2 dependency for terminal colors
+- Added `cli-table3` v0.6.5 dependency for formatted tables
+- Created `src/core/table.ts` helper module for table creation and rendering
+- Created `src/core/error_helper.ts` for consistent error display with suggestions
+- Enhanced `Logger` class with color support while maintaining JSON mode compatibility
+- All improvements maintain backward compatibility with JSON mode
+
+---
+
 ## [0.7.0] – 2026-01-01
 
 ### Added

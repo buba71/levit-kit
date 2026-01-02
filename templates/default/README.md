@@ -5,6 +5,19 @@ It is designed for a **hybrid workspace** where Human vision leads and AI execut
 
 ## 🚀 Quick Start: Human Operator Guide
 
+### 📖 Start Here: Read the Human-Agent Manager Guide
+
+**New to managing AI agents?** Start with the comprehensive guide:
+- **[HUMAN_AGENT_MANAGER.md](./HUMAN_AGENT_MANAGER.md)**: Complete guide on managing AI agents effectively
+
+This guide covers:
+- Understanding the Human-AI partnership
+- Creating effective features and decisions
+- Making handoffs that work
+- Reviewing agent work
+- Best practices and anti-patterns
+- Troubleshooting common issues
+
 ### 1. The Day One Setup
 - **Adjust Governance**: Open `SOCIAL_CONTRACT.md` and tweak the principles to match your vision.
 - **Define Standards**: Open `.levit/prompts/global-rules.md` to set your technical expectations (language, styling, strictness).
@@ -29,6 +42,7 @@ This repository is built for **clarity over automation**:
 - **Traceability**: All technical choices are documented (run `levit decision new` to create a record in `.levit/decisions/`).
 
 ## 📂 Navigation
+- `HUMAN_AGENT_MANAGER.md`: **Complete guide for managing AI agents** (start here!)
 - `SOCIAL_CONTRACT.md`: Your ethical and operational foundations.
 - `.levit/`: The AI's workspace (Onboarding, Prompts, Workflows, Features, Roles, etc.).
   - `.levit/features/`: The project roadmap and active intents.

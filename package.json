@@ -1,6 +1,6 @@
 {
   "name": "@buba_71/levit",
-  "version": "0.7.0",
+  "version": "0.8.1",
   "description": "Hybrid starter kit for Antigravity projects",
   "author": "David BUBA",
   "license": "MIT",
@@ -25,7 +25,9 @@
   },
   "dependencies": {
     "fs-extra": "^11.2.0",
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.1.1",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

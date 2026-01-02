@@ -1,10 +1,14 @@
 import readline from "node:readline/promises";
+import chalk from "chalk";
+import path from "node:path";
 
 import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
 import { Logger } from "../core/logger";
 import { FeatureService } from "../services/feature_service";
 import { LevitError, LevitErrorCode } from "../core/errors";
+import { createTable, renderTable, createBox } from "../core/table";
+import { nextSequentialId } from "../core/ids";
 
 function normalizeSlug(input: string): string {
   return input
@@ -47,6 +51,7 @@ export async function featureCommand(argv: string[], cwd: string) {
 async function handleFeatureNew(projectRoot: string, flags: Record<string, string | boolean>) {
   const yes = getBooleanFlag(flags, "yes");
   const overwrite = getBooleanFlag(flags, "force");
+  const isJsonMode = Logger.getJsonMode();
 
   let title = getStringFlag(flags, "title");
   let slug = getStringFlag(flags, "slug");
@@ -74,37 +79,90 @@ async function handleFeatureNew(projectRoot: string, flags: Record<string, strin
     throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Missing --slug");
   }
 
+  // Generate ID if not provided
+  if (!id) {
+    const baseDir = path.join(projectRoot, ".levit", "features");
+    id = nextSequentialId(baseDir, /^(\d+)-/);
+  }
+
+  // Preview before creation
+  if (!yes && !isJsonMode) {
+    const featurePath = path.relative(projectRoot, path.join(projectRoot, ".levit", "features", `${id}-${slug}.md`));
+    const preview = createBox("Feature Preview", {
+      "ID": id,
+      "Title": title,
+      "Slug": slug,
+      "Path": featurePath
+    });
+    
+    Logger.info("");
+    Logger.info(preview);
+    Logger.info("");
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const confirm = await rl.question("Create this feature? [y/N]: ");
+    await rl.close();
+
+    if (confirm.toLowerCase() !== "y" && confirm.toLowerCase() !== "yes") {
+      Logger.info("Cancelled.");
+      return;
+    }
+  }
+
   const createdPath = FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
-  Logger.info(`Created ${createdPath}`);
+  Logger.success(`Created ${createdPath}`);
 }
 
 function handleFeatureList(projectRoot: string, flags: Record<string, string | boolean>) {
   const features = FeatureService.listFeatures(projectRoot);
+  const isJsonMode = Logger.getJsonMode();
 
   if (features.length === 0) {
     Logger.info("No features found.");
     return;
   }
 
-  // Format as table
-  Logger.info("");
-  Logger.info("Features:");
-  Logger.info("─".repeat(80));
+  // Create formatted table
+  const table = createTable(["ID", "Status", "Title"]);
   
   for (const feature of features) {
-    const statusEmoji = {
-      active: "🟢",
-      draft: "🟡",
-      deprecated: "🔴",
-      completed: "✅"
-    }[feature.status] || "⚪";
+    // Color status based on value
+    let statusDisplay: string = feature.status;
+    switch (feature.status) {
+      case "active":
+        statusDisplay = isJsonMode ? "active" : chalk.green("● active");
+        break;
+      case "draft":
+        statusDisplay = isJsonMode ? "draft" : chalk.yellow("○ draft");
+        break;
+      case "deprecated":
+        statusDisplay = isJsonMode ? "deprecated" : chalk.red("× deprecated");
+        break;
+      case "completed":
+        statusDisplay = isJsonMode ? "completed" : chalk.cyan("✓ completed");
+        break;
+    }
     
-    Logger.info(`${statusEmoji} ${feature.id.padStart(3, " ")} | ${feature.status.padEnd(10)} | ${feature.title}`);
+    (table as any).push([
+      feature.id,
+      statusDisplay,
+      feature.title
+    ]);
   }
   
-  Logger.info("─".repeat(80));
-  Logger.info(`Total: ${features.length} feature(s)`);
-  Logger.info("");
+  if (!isJsonMode) {
+    Logger.info("");
+    Logger.info(chalk.bold("Features:"));
+  }
+  
+  renderTable(table, isJsonMode);
+  
+  if (!isJsonMode) {
+    Logger.info(`\nTotal: ${chalk.bold(features.length.toString())} feature(s)`);
+    Logger.info("");
+  } else {
+    Logger.info(JSON.stringify({ total: features.length }));
+  }
 }
 
 async function handleFeatureStatus(

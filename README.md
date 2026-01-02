@@ -126,6 +126,8 @@ Levit-kit installs a cognitive pipeline in your project:
 5.  **Verification**: You or the agent run quality tests in `.levit/evals/`.
 6.  **Review**: The agent submits its work following the protocol in `.levit/workflows/`.
 
+> **📖 New to managing AI agents?** After initializing a project, read `HUMAN_AGENT_MANAGER.md` for a comprehensive guide on effectively managing AI agents, including best practices, anti-patterns, and troubleshooting.
+
 ---
 
 ## Examples

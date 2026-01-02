@@ -10,6 +10,7 @@ import path from "node:path";
 
 import { Logger } from "../src/core/logger";
 import { LevitError, LevitErrorCode } from "../src/core/errors";
+import { displayError } from "../src/core/error_helper";
 
 function showHelp() {
   Logger.info(`
@@ -79,15 +80,33 @@ async function main() {
         break;
 
       default:
-        Logger.error(`Unknown command "${command}"`);
+        displayError(new LevitError(
+          LevitErrorCode.INVALID_COMMAND,
+          `Unknown command "${command}"`
+        ));
+        Logger.info("");
         showHelp();
         process.exit(1);
     }
   } catch (error) {
     if (error instanceof LevitError) {
-      Logger.error(`${error.message} (Code: ${error.code})`);
+      displayError(error);
     } else {
-      Logger.error(error instanceof Error ? error.message : "Unexpected error", error);
+      const isJsonMode = Logger.getJsonMode();
+      if (isJsonMode) {
+        Logger.error(JSON.stringify({
+          error: {
+            code: "UNEXPECTED_ERROR",
+            message: error instanceof Error ? error.message : "Unexpected error",
+            details: error instanceof Error ? error.stack : String(error),
+          },
+        }));
+      } else {
+        Logger.error(error instanceof Error ? error.message : "Unexpected error");
+        if (error instanceof Error && error.stack) {
+          Logger.debug(error.stack);
+        }
+      }
     }
     process.exit(1);
   }
