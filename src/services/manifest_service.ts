@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "node:path";
 import { LevitManifest, DEFAULT_MANIFEST, FeatureRef, RoleRef } from "../types/manifest";
 import { parseFrontmatter } from "../core/frontmatter";
+import { readFileSafe } from "../core/security";
 
 export class ManifestService {
   static read(projectRoot: string): LevitManifest {
@@ -43,7 +44,14 @@ export class ManifestService {
       .filter(f => f.endsWith(".md") && f !== "README.md" && f !== "INTENT.md");
 
     return files.map(file => {
-      const content = fs.readFileSync(path.join(featuresDir, file), "utf-8");
+      // Validate filename to prevent path traversal
+      if (file.includes("..") || file.includes("/") || file.includes("\\")) {
+        // Skip invalid filenames
+        return null;
+      }
+      
+      const filePath = path.join(featuresDir, file);
+      const content = readFileSafe(filePath, projectRoot);
       const frontmatter = this.parseFrontmatter(content);
       
       // Extract ID and slug from filename (e.g., "001-my-feature.md")
@@ -62,7 +70,7 @@ export class ManifestService {
         title,
         path: `.levit/features/${file}`
       };
-    });
+    }).filter((f): f is FeatureRef => f !== null);
   }
 
   private static scanRoles(projectRoot: string): RoleRef[] {
@@ -75,20 +83,31 @@ export class ManifestService {
     const files = fs.readdirSync(rolesDir)
       .filter(f => f.endsWith(".md") && f !== "README.md");
 
-    return files.map(file => {
+    const roles: RoleRef[] = [];
+    
+    for (const file of files) {
+      // Validate filename to prevent path traversal
+      if (file.includes("..") || file.includes("/") || file.includes("\\")) {
+        // Skip invalid filenames
+        continue;
+      }
+      
       const name = file.replace(".md", "");
-      const content = fs.readFileSync(path.join(rolesDir, file), "utf-8");
+      const filePath = path.join(rolesDir, file);
+      const content = readFileSafe(filePath, projectRoot);
       
       // Try to extract description from first line or heading
       const lines = content.split("\n").filter(l => l.trim());
       const description = lines.length > 0 ? lines[0].replace(/^#\s*/, "") : undefined;
 
-      return {
+      roles.push({
         name,
         description,
         path: `.levit/roles/${file}`
-      };
-    });
+      });
+    }
+    
+    return roles;
   }
 
   private static parseFrontmatter(content: string): Record<string, any> {

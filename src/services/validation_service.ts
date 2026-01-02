@@ -3,6 +3,7 @@ import path from "node:path";
 import { LevitError, LevitErrorCode } from "../core/errors";
 import { parseFrontmatter, extractFrontmatterString } from "../core/frontmatter";
 import { ManifestService } from "./manifest_service";
+import { readFileSafe, validatePath } from "../core/security";
 
 export interface ValidationIssue {
   type: "error" | "warning";
@@ -71,7 +72,19 @@ export class ValidationService {
           });
         } else {
           for (const file of files) {
-            const content = fs.readFileSync(path.join(featuresPath, file), "utf8");
+            // Validate filename to prevent path traversal
+            if (file.includes("..") || file.includes("/") || file.includes("\\")) {
+              issues.push({
+                type: "error",
+                code: LevitErrorCode.VALIDATION_FAILED,
+                message: `Invalid filename detected: ${file}`,
+                file: path.join("features", file)
+              });
+              continue;
+            }
+            
+            const filePath = path.join(featuresPath, file);
+            const content = readFileSafe(filePath, projectRoot);
             const { valid, missing } = this.hasValidFrontmatter(content, "feature");
             if (!valid) {
               issues.push({
@@ -99,7 +112,19 @@ export class ValidationService {
         const files = fs.readdirSync(decisionsPath).filter((f) => f.endsWith(".md") && f !== "README.md");
         filesScanned += files.length;
         for (const file of files) {
-          const content = fs.readFileSync(path.join(decisionsPath, file), "utf8");
+          // Validate filename to prevent path traversal
+          if (file.includes("..") || file.includes("/") || file.includes("\\")) {
+            issues.push({
+              type: "error",
+              code: LevitErrorCode.VALIDATION_FAILED,
+              message: `Invalid filename detected: ${file}`,
+              file: path.join(".levit/decisions", file)
+            });
+            continue;
+          }
+          
+          const filePath = path.join(decisionsPath, file);
+          const content = readFileSafe(filePath, projectRoot);
           const { valid, missing } = this.hasValidFrontmatter(content, "decision");
           if (!valid) {
             issues.push({
@@ -118,7 +143,19 @@ export class ValidationService {
         const files = fs.readdirSync(handoffsPath).filter((f) => f.endsWith(".md") && f !== "README.md");
         filesScanned += files.length;
         for (const file of files) {
-          const content = fs.readFileSync(path.join(handoffsPath, file), "utf8");
+          // Validate filename to prevent path traversal
+          if (file.includes("..") || file.includes("/") || file.includes("\\")) {
+            issues.push({
+              type: "error",
+              code: LevitErrorCode.VALIDATION_FAILED,
+              message: `Invalid filename detected: ${file}`,
+              file: path.join(".levit/handoff", file)
+            });
+            continue;
+          }
+          
+          const filePath = path.join(handoffsPath, file);
+          const content = readFileSafe(filePath, projectRoot);
           const { valid, missing } = this.hasValidFrontmatter(content, "handoff");
           if (!valid) {
             issues.push({
@@ -171,7 +208,13 @@ export class ValidationService {
         .filter(f => f.endsWith(".md") && f !== "README.md");
       
       for (const file of decisionFiles) {
-        const content = fs.readFileSync(path.join(decisionsPath, file), "utf-8");
+        // Validate filename to prevent path traversal
+        if (file.includes("..") || file.includes("/") || file.includes("\\")) {
+          continue; // Skip invalid filenames
+        }
+        
+        const filePath = path.join(decisionsPath, file);
+        const content = readFileSafe(filePath, projectRoot);
         try {
           const frontmatter = parseFrontmatter(content);
           if (frontmatter.id) {
@@ -191,7 +234,7 @@ export class ValidationService {
       }
 
       try {
-        const content = fs.readFileSync(featurePath, "utf-8");
+        const content = readFileSafe(featurePath, projectRoot);
         const frontmatter = parseFrontmatter(content);
         const dependsOn = frontmatter.depends_on || [];
 
@@ -251,7 +294,7 @@ export class ValidationService {
       if (!fs.existsSync(featurePath)) continue;
 
       try {
-        const content = fs.readFileSync(featurePath, "utf-8");
+        const content = readFileSafe(featurePath, projectRoot);
         const frontmatter = parseFrontmatter(content);
         const dependsOn = frontmatter.depends_on || [];
         const deps = Array.isArray(dependsOn) ? dependsOn : [dependsOn];
@@ -431,8 +474,16 @@ export class ValidationService {
     const checkFile = (filePath: string): void => {
       if (!fs.existsSync(filePath)) return;
       
+      // Validate path is within project root
       try {
-        const content = fs.readFileSync(filePath, "utf-8");
+        validatePath(filePath, projectRoot);
+      } catch (error) {
+        // Skip files outside project root
+        return;
+      }
+      
+      try {
+        const content = readFileSafe(filePath, projectRoot);
         
         for (const pattern of patterns) {
           // Support both regex and simple string patterns

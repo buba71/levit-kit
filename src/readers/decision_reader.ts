@@ -2,10 +2,14 @@ import fs from "fs-extra";
 import path from "node:path";
 import { Decision } from "../types";
 import { parseFrontmatter } from "../core/frontmatter";
+import { readFileSafe } from "../core/security";
 
 export class DecisionReader {
-  static parse(filePath: string): Decision {
-    const content = fs.readFileSync(filePath, "utf8");
+  static parse(filePath: string, projectRoot?: string): Decision {
+    // Use safe file reading with path validation if projectRoot is provided
+    const content = projectRoot 
+      ? readFileSafe(filePath, projectRoot)
+      : readFileSafe(filePath);
     const lines = content.split("\n");
     
     // Parse frontmatter using robust YAML parser
@@ -35,10 +39,14 @@ export class DecisionReader {
     };
   }
 
-  static listAll(decisionsDir: string): Decision[] {
+  static listAll(decisionsDir: string, projectRoot?: string): Decision[] {
     if (!fs.existsSync(decisionsDir)) return [];
+    const baseDir = projectRoot || path.dirname(decisionsDir);
     return fs.readdirSync(decisionsDir)
       .filter(f => f.endsWith(".md") && f !== "README.md")
-      .map(f => this.parse(path.join(decisionsDir, f)));
+      .map(f => {
+        const filePath = path.join(decisionsDir, f);
+        return this.parse(filePath, baseDir);
+      });
   }
 }

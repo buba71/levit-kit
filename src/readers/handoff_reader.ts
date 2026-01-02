@@ -2,10 +2,14 @@ import fs from "fs-extra";
 import path from "node:path";
 import { Handoff } from "../types";
 import { parseFrontmatter } from "../core/frontmatter";
+import { readFileSafe } from "../core/security";
 
 export class HandoffReader {
-  static parse(filePath: string): Handoff {
-    const content = fs.readFileSync(filePath, "utf8");
+  static parse(filePath: string, projectRoot?: string): Handoff {
+    // Use safe file reading with path validation if projectRoot is provided
+    const content = projectRoot 
+      ? readFileSafe(filePath, projectRoot)
+      : readFileSafe(filePath);
     
     // Parse frontmatter using robust YAML parser
     const frontmatter = parseFrontmatter(content);
@@ -35,10 +39,14 @@ export class HandoffReader {
     };
   }
 
-  static listAll(handoffsDir: string): Handoff[] {
+  static listAll(handoffsDir: string, projectRoot?: string): Handoff[] {
     if (!fs.existsSync(handoffsDir)) return [];
+    const baseDir = projectRoot || path.dirname(handoffsDir);
     return fs.readdirSync(handoffsDir)
       .filter(f => f.endsWith(".md") && f !== "README.md")
-      .map(f => this.parse(path.join(handoffsDir, f)));
+      .map(f => {
+        const filePath = path.join(handoffsDir, f);
+        return this.parse(filePath, baseDir);
+      });
   }
 }

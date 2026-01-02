@@ -2,6 +2,8 @@ import path from "node:path";
 import { writeTextFile } from "../core/write_file";
 import { nextSequentialId } from "../core/ids";
 import { ManifestService } from "./manifest_service";
+import { writeFileSafe } from "../core/security";
+import { LevitError, LevitErrorCode } from "../core/errors";
 
 export interface CreateDecisionOptions {
   title: string;
@@ -32,6 +34,15 @@ export class DecisionService {
 
      const slug = normalizeSlug(title);
      const fileName = `ADR-${id}-${slug}.md`;
+     
+     // Validate filename to prevent path traversal
+     if (fileName.includes("..") || fileName.includes("/") || fileName.includes("\\")) {
+       throw new LevitError(
+         LevitErrorCode.VALIDATION_FAILED,
+         `Invalid decision filename: "${fileName}" contains invalid characters`
+       );
+     }
+     
      const decisionPath = path.join(baseDir, fileName);
 
      const date = new Date().toISOString().split("T")[0];
@@ -50,7 +61,8 @@ depends_on: [${featureRef || ""}]
 
      const content = `${frontmatter}# ADR ${id}: ${title}\n\n- **Date**: ${date}\n- **Status**: [Draft / Proposed / Approved]\n${featureLine}\n## Context\n[fill]\n\n## Decision\n[fill]\n\n## Rationale\n[fill]\n\n## Alternatives Considered\n[fill]\n\n## Consequences\n[fill]\n`;
 
-     writeTextFile(decisionPath, content, { overwrite: !!overwrite });
+     // Use secure file writing with path validation
+     writeFileSafe(decisionPath, projectRoot, content, { overwrite: !!overwrite });
      
      // Auto-sync manifest after decision creation
      ManifestService.sync(projectRoot);

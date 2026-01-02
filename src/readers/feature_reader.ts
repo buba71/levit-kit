@@ -2,10 +2,14 @@ import fs from "fs-extra";
 import path from "node:path";
 import { Feature } from "../types";
 import { parseFrontmatter } from "../core/frontmatter";
+import { readFileSafe } from "../core/security";
 
 export class FeatureReader {
-  static parse(filePath: string): Feature {
-    const content = fs.readFileSync(filePath, "utf8");
+  static parse(filePath: string, projectRoot?: string): Feature {
+    // Use safe file reading with path validation if projectRoot is provided
+    const content = projectRoot 
+      ? readFileSafe(filePath, projectRoot)
+      : readFileSafe(filePath);
     const lines = content.split("\n");
     
     // Parse frontmatter using robust YAML parser
@@ -36,10 +40,14 @@ export class FeatureReader {
     };
   }
 
-  static listAll(featuresDir: string): Feature[] {
+  static listAll(featuresDir: string, projectRoot?: string): Feature[] {
     if (!fs.existsSync(featuresDir)) return [];
+    const baseDir = projectRoot || path.dirname(featuresDir);
     return fs.readdirSync(featuresDir)
       .filter(f => f.endsWith(".md") && f !== "README.md")
-      .map(f => this.parse(path.join(featuresDir, f)));
+      .map(f => {
+        const filePath = path.join(featuresDir, f);
+        return this.parse(filePath, baseDir);
+      });
   }
 }

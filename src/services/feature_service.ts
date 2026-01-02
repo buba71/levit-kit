@@ -7,6 +7,7 @@ import { ManifestService } from "./manifest_service";
 import { parseFrontmatter } from "../core/frontmatter";
 import { FeatureRef } from "../types/manifest";
 import { LevitError, LevitErrorCode } from "../core/errors";
+import { readFileSafe, writeFileSafe } from "../core/security";
 
 export interface CreateFeatureOptions {
   title: string;
@@ -29,6 +30,14 @@ export class FeatureService {
     
     const fileName = `${id}-${slug}.md`;
     const featurePath = path.join(baseDir, fileName);
+    
+    // Validate slug to prevent path traversal
+    if (fileName.includes("..") || fileName.includes("/") || fileName.includes("\\")) {
+      throw new LevitError(
+        LevitErrorCode.VALIDATION_FAILED,
+        `Invalid feature filename: "${fileName}" contains invalid characters`
+      );
+    }
 
     const date = new Date().toISOString().split("T")[0];
     
@@ -46,7 +55,8 @@ depends_on: []
 
     const content = `${frontmatter}# INTENT: ${title}\n\n## 1. Vision (The "Why")\n- **User Story**: [fill]\n- **Priority**: [Low / Medium / High / Critical]\n\n## 2. Success Criteria (The "What")\n- [ ] Criterion 1\n\n## 3. Boundaries (The "No")\n- Non-goal 1\n\n## 4. Technical Constraints\n- [fill]\n\n## 5. Agent Task\n- [fill]\n`;
 
-    writeTextFile(featurePath, content, { overwrite: !!overwrite });
+    // Use secure file writing with path validation
+    writeFileSafe(featurePath, projectRoot, content, { overwrite: !!overwrite });
     
     // Auto-sync manifest after feature creation
     ManifestService.sync(projectRoot);
@@ -82,14 +92,9 @@ depends_on: []
 
     // Update the feature file
     const featurePath = path.join(projectRoot, feature.path);
-    if (!fs.existsSync(featurePath)) {
-      throw new LevitError(
-        LevitErrorCode.MISSING_FILE,
-        `Feature file not found: ${feature.path}`
-      );
-    }
-
-    const content = fs.readFileSync(featurePath, "utf-8");
+    
+    // Use secure file reading with path validation
+    const content = readFileSafe(featurePath, projectRoot);
     const lines = content.split("\n");
     
     // Find frontmatter section
@@ -119,7 +124,9 @@ depends_on: []
     
     // Reconstruct file
     const newContent = `---\n${frontmatterYaml}---\n\n${lines.slice(frontmatterStart + frontmatterEnd + 2).join("\n")}`;
-    fs.writeFileSync(featurePath, newContent, "utf-8");
+    
+    // Use secure file writing with path validation
+    writeFileSafe(featurePath, projectRoot, newContent, { overwrite: true });
 
     // Sync manifest
     ManifestService.sync(projectRoot);
