@@ -4,13 +4,17 @@ import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
 import { Logger } from "../core/logger";
 import { HandoffService } from "../services/handoff_service";
+import { LevitError, LevitErrorCode } from "../core/errors";
 
 export async function handoffCommand(argv: string[], cwd: string) {
   const { positional, flags } = parseArgs(argv);
 
   const sub = positional[0];
   if (sub !== "new") {
-    throw new Error("Usage: levit handoff new --feature <features/001-...md> [--role developer|qa|security|devops]");
+    throw new LevitError(
+      LevitErrorCode.INVALID_COMMAND,
+      "Usage: levit handoff new --feature <features/001-...md> [--role developer|qa|security|devops]"
+    );
   }
 
   const projectRoot = requireLevitProjectRoot(cwd);
@@ -36,7 +40,7 @@ export async function handoffCommand(argv: string[], cwd: string) {
   }
 
   if (!feature) {
-    throw new Error("Missing --feature");
+    throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Missing --feature");
   }
   if (!role) {
     role = "developer";

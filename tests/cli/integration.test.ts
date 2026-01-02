@@ -192,9 +192,13 @@ test("CLI --version works", () => {
 
 test("CLI name validation works", () => {
   try {
-    execSync("node dist/bin/cli.js init invalid/name");
+    execSync("node dist/bin/cli.js init invalid/name", { encoding: "utf-8" });
     assert.fail("Should have failed with invalid name");
   } catch (error: any) {
-    assert.ok(error.stderr.toString().includes("Error: Invalid project name"));
+    const output = (error.stderr?.toString() || error.stdout?.toString() || error.message || "").toLowerCase();
+    assert.ok(
+      output.includes("invalid project name") || output.includes("invalid_project_name"),
+      `Expected error message about invalid project name, got: ${error.stderr?.toString() || error.message}`
+    );
   }
 });

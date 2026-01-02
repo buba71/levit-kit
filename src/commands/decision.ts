@@ -4,13 +4,17 @@ import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
 import { Logger } from "../core/logger";
 import { DecisionService } from "../services/decision_service";
+import { LevitError, LevitErrorCode } from "../core/errors";
 
 export async function decisionCommand(argv: string[], cwd: string) {
   const { positional, flags } = parseArgs(argv);
 
   const sub = positional[0];
   if (sub !== "new") {
-    throw new Error('Usage: levit decision new [--title "..."] [--id "001"]');
+    throw new LevitError(
+      LevitErrorCode.INVALID_COMMAND,
+      'Usage: levit decision new [--title "..."] [--id "001"]'
+    );
   }
 
   const projectRoot = requireLevitProjectRoot(cwd);
@@ -33,7 +37,7 @@ export async function decisionCommand(argv: string[], cwd: string) {
   }
 
   if (!title) {
-    throw new Error("Missing --title");
+    throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Missing --title");
   }
 
   const createdPath = DecisionService.createDecision(projectRoot, { title, featureRef, id, overwrite });

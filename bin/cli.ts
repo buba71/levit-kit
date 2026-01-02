@@ -9,7 +9,7 @@ import { getVersion } from "../src/core/version";
 import path from "node:path";
 
 import { Logger } from "../src/core/logger";
-import { LevitError } from "../src/core/errors";
+import { LevitError, LevitErrorCode } from "../src/core/errors";
 
 function showHelp() {
   Logger.info(`
@@ -53,7 +53,10 @@ async function main() {
       case "init":
         const projectName = args[1];
         if (!projectName) {
-          throw new Error("Project name is required. Usage: levit init <project-name>");
+          throw new LevitError(
+            LevitErrorCode.MISSING_REQUIRED_ARG,
+            "Project name is required. Usage: levit init <project-name>"
+          );
         }
         initProject(projectName, path.resolve(process.cwd(), projectName));
         break;

@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { LevitManifest, DEFAULT_MANIFEST, FeatureRef, RoleRef } from "../types/manifest";
+import { parseFrontmatter } from "../core/frontmatter";
 
 export class ManifestService {
   static read(projectRoot: string): LevitManifest {
@@ -91,22 +92,12 @@ export class ManifestService {
   }
 
   private static parseFrontmatter(content: string): Record<string, any> {
-    const lines = content.split("\n");
-    if (lines[0].trim() !== "---") return {};
-    
-    const endIndex = lines.slice(1).findIndex(line => line.trim() === "---");
-    if (endIndex === -1) return {};
-
-    const frontmatterLines = lines.slice(1, endIndex + 1);
-    const result: Record<string, any> = {};
-
-    for (const line of frontmatterLines) {
-      const match = line.match(/^(\w+):\s*(.+)$/);
-      if (match) {
-        result[match[1]] = match[2].trim();
-      }
+    try {
+      return parseFrontmatter(content);
+    } catch (error) {
+      // If parsing fails, return empty object to allow graceful degradation
+      // The validation service will catch and report the error
+      return {};
     }
-
-    return result;
   }
 }

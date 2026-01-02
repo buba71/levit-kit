@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { LevitError, LevitErrorCode } from "../core/errors";
+import { parseFrontmatter, extractFrontmatterString } from "../core/frontmatter";
 
 export interface ValidationIssue {
   type: "error" | "warning";
@@ -144,20 +145,30 @@ export class ValidationService {
   }
 
   private static hasValidFrontmatter(content: string, type: "feature" | "decision" | "handoff"): { valid: boolean; missing: string[] } {
-    const lines = content.split("\n");
-    if (lines[0].trim() !== "---") return { valid: false, missing: ["Opening ---"] };
-    const endIndex = lines.slice(1).findIndex((line) => line.trim() === "---");
-    if (endIndex === -1) return { valid: false, missing: ["Closing ---"] };
-
-    const frontmatter = lines.slice(1, endIndex + 1).join("\n");
-    const required = ["id:", "status:", "owner:", "last_updated:", "risk_level:"];
-    if (type !== "decision") {
-      required.push("depends_on:");
-    } else {
-      required.push("depends_on:"); // Decisions also have depends_on for feature ref
+    // First check if frontmatter exists
+    const frontmatterString = extractFrontmatterString(content);
+    if (frontmatterString === null) {
+      return { valid: false, missing: ["Frontmatter block (---)"] };
     }
 
-    const missing = required.filter((key) => !frontmatter.includes(key));
+    // Try to parse frontmatter
+    let frontmatter: Record<string, any>;
+    try {
+      frontmatter = parseFrontmatter(content);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      return { valid: false, missing: [`Invalid YAML: ${message}`] };
+    }
+
+    // Check required fields
+    const required: string[] = ["id", "status", "owner", "last_updated", "risk_level"];
+    if (type !== "decision") {
+      required.push("depends_on");
+    } else {
+      required.push("depends_on"); // Decisions also have depends_on for feature ref
+    }
+
+    const missing = required.filter((key) => !(key in frontmatter) || frontmatter[key] === undefined || frontmatter[key] === null);
     return { valid: missing.length === 0, missing };
   }
 }

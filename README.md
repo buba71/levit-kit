@@ -106,6 +106,135 @@ Levit-kit installs a cognitive pipeline in your project:
 
 ---
 
+## Examples
+
+### Example 1: Creating a New Feature
+
+```bash
+# Interactive mode (prompts for input)
+$ levit feature new
+Feature title: User Authentication
+Feature slug [user-authentication]: 
+Created features/001-user-authentication.md
+
+# Non-interactive mode (with flags)
+$ levit feature new --title "User Authentication" --slug user-authentication --yes
+Created features/001-user-authentication.md
+```
+
+The created feature file includes:
+- Frontmatter with metadata (id, status, owner, risk_level, etc.)
+- Template sections: Vision, Success Criteria, Boundaries, Technical Constraints, Agent Task
+
+### Example 2: Creating an Architecture Decision
+
+```bash
+# Link a decision to a feature
+$ levit decision new --title "Use PostgreSQL for user data" --feature features/001-user-authentication.md --yes
+Created .levit/decisions/ADR-001-use-postgresql-for-user-data.md
+
+# Auto-assign ID
+$ levit decision new --title "Implement JWT authentication" --yes
+Created .levit/decisions/ADR-002-implement-jwt-authentication.md
+```
+
+### Example 3: Creating an Agent Handoff
+
+```bash
+# Handoff a feature to a developer agent
+$ levit handoff new --feature features/001-user-authentication.md --role developer --yes
+Created .levit/handoff/2026-01-01-001-user-authentication-developer.md
+
+# Handoff to security reviewer
+$ levit handoff new --feature features/001-user-authentication.md --role security --yes
+Created .levit/handoff/2026-01-01-001-user-authentication-security.md
+```
+
+### Example 4: Validating Project Structure
+
+```bash
+# Human-readable output
+$ levit validate
+🔍 Validating project cognitive scaffolding...
+✨ All cognitive scaffolding checks passed!
+
+# JSON output (for automation)
+$ levit validate --json
+{"level":"INFO","message":"🔍 Validating project cognitive scaffolding...","timestamp":"2026-01-01T12:00:00.000Z"}
+{"level":"INFO","message":"✨ All cognitive scaffolding checks passed!","timestamp":"2026-01-01T12:00:00.000Z"}
+```
+
+### Example 5: Complete Workflow
+
+Here's a complete workflow from feature creation to agent handoff:
+
+```bash
+# 1. Initialize project
+$ npx @buba_71/levit init my-api-project
+$ cd my-api-project
+
+# 2. Create a feature
+$ levit feature new --title "API Rate Limiting" --slug api-rate-limiting --yes
+Created features/001-api-rate-limiting.md
+
+# 3. Create a technical decision
+$ levit decision new --title "Use Redis for rate limiting" --feature features/001-api-rate-limiting.md --yes
+Created .levit/decisions/ADR-001-use-redis-for-rate-limiting.md
+
+# 4. Handoff to developer
+$ levit handoff new --feature features/001-api-rate-limiting.md --role developer --yes
+Created .levit/handoff/2026-01-01-001-api-rate-limiting-developer.md
+
+# 5. Agent reads handoff and implements
+# (Agent reads .levit/handoff/2026-01-01-001-api-rate-limiting-developer.md)
+
+# 6. Validate after implementation
+$ levit validate
+🔍 Validating project cognitive scaffolding...
+✨ All cognitive scaffolding checks passed!
+```
+
+### Example 6: Working with the Manifest
+
+The `levit.json` manifest is automatically synced when you create features or decisions. You can also manually inspect it:
+
+```json
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "my-api-project",
+    "description": "AI-Driven Development project powered by levit-kit"
+  },
+  "governance": {
+    "autonomy_level": "low",
+    "risk_tolerance": "low"
+  },
+  "features": [
+    {
+      "id": "001",
+      "slug": "api-rate-limiting",
+      "status": "active",
+      "title": "API Rate Limiting",
+      "path": "features/001-api-rate-limiting.md"
+    }
+  ],
+  "roles": [
+    {
+      "name": "developer",
+      "description": "Developer Role",
+      "path": "roles/developer.md"
+    }
+  ],
+  "constraints": {
+    "max_file_size": 1000000,
+    "allowed_dependencies": [],
+    "forbidden_patterns": []
+  }
+}
+```
+
+---
+
 ## Where does the levit command come from?
 
 The `levit` command is provided through the npm ecosystem.

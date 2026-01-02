@@ -1,17 +1,21 @@
 import { Logger } from "../core/logger";
 import { getVersion } from "../core/version";
 import { ProjectService } from "../services/project_service";
+import { LevitError, LevitErrorCode } from "../core/errors";
 
 export function initProject(projectName: string, targetPath: string) {
   const version = getVersion();
 
   if (!projectName) {
-    throw new Error("Project name is required.");
+    throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Project name is required.");
   }
 
   // Ensure project name is valid for a directory
   if (!/^[a-z0-9-_]+$/i.test(projectName)) {
-    throw new Error("Invalid project name. Use only letters, numbers, dashes, and underscores.");
+    throw new LevitError(
+      LevitErrorCode.INVALID_PROJECT_NAME,
+      "Invalid project name. Use only letters, numbers, dashes, and underscores."
+    );
   }
 
   ProjectService.init(projectName, targetPath);

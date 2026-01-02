@@ -4,6 +4,7 @@ import { requireLevitProjectRoot } from "../core/levit_project";
 import { getBooleanFlag, getStringFlag, parseArgs } from "../core/cli_args";
 import { Logger } from "../core/logger";
 import { FeatureService } from "../services/feature_service";
+import { LevitError, LevitErrorCode } from "../core/errors";
 
 function normalizeSlug(input: string): string {
   return input
@@ -18,7 +19,10 @@ export async function featureCommand(argv: string[], cwd: string) {
 
   const sub = positional[0];
   if (sub !== "new") {
-    throw new Error('Usage: levit feature new [--title "..."] [--slug "..."] [--id "001"]');
+    throw new LevitError(
+      LevitErrorCode.INVALID_COMMAND,
+      'Usage: levit feature new [--title "..."] [--slug "..."] [--id "001"]'
+    );
   }
 
   const projectRoot = requireLevitProjectRoot(cwd);
@@ -46,10 +50,10 @@ export async function featureCommand(argv: string[], cwd: string) {
   }
 
   if (!title) {
-    throw new Error("Missing --title");
+    throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Missing --title");
   }
   if (!slug) {
-    throw new Error("Missing --slug");
+    throw new LevitError(LevitErrorCode.MISSING_REQUIRED_ARG, "Missing --slug");
   }
 
   const createdPath = FeatureService.createFeature(projectRoot, { title, slug, id, overwrite });
